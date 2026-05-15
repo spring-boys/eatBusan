@@ -17,14 +17,18 @@ import org.springframework.web.util.DefaultUriBuilderFactory.EncodingMode;
 @RequiredArgsConstructor
 public class RestClientConfig {
 
-    @Value("${data.api.baseurl}")
-    private final String baseUrl;
+    @Value("${data.kakao.api.baseurl}")
+    private String baseUrl;
+
+    @Value("${data.kakao.api.service.key}")
+    private String serviceKey;
 
     @Bean
-    public RestClient dataClient(){
+    public RestClient kakaoClient(){
         return RestClient.builder()
                 .requestFactory(requestFactory())
                 .uriBuilderFactory(uriBuilderFactory())
+                .defaultHeader("Authorization", "KakaoAK " + serviceKey)
                 .defaultStatusHandler(
                         HttpStatusCode::is4xxClientError,
                         (req, res) -> log.info("4xxClientError")
@@ -39,15 +43,15 @@ public class RestClientConfig {
     @Bean
     public SimpleClientHttpRequestFactory requestFactory(){
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout(Duration.ofSeconds(60L));
-        requestFactory.setConnectTimeout(Duration.ofSeconds(60L));
+        requestFactory.setConnectTimeout(Duration.ofSeconds(120L));
+        requestFactory.setReadTimeout(Duration.ofSeconds(120L));
         return requestFactory;
     }
 
     @Bean
     public DefaultUriBuilderFactory uriBuilderFactory(){
         DefaultUriBuilderFactory uriBuilderFactory = new DefaultUriBuilderFactory(baseUrl);
-        uriBuilderFactory.setEncodingMode(EncodingMode.NONE);
+        uriBuilderFactory.setEncodingMode(EncodingMode.TEMPLATE_AND_VALUES);
         return uriBuilderFactory;
     }
 
