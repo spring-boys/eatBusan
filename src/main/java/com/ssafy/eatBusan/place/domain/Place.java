@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Entity
 @Getter
-public class place {
+public class Place {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
