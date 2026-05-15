@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/places")
+@RequestMapping("/api/places")
 @RequiredArgsConstructor
 public class PlaceController {
 
@@ -19,7 +19,7 @@ public class PlaceController {
     @GetMapping("/search")
     public void serchPlace(){
         System.out.println("search");
-        kakaoApiUtil.searchPlaces();
+        kakaoApiUtil.searchPlaces(); //결과를 list에 넣어서 반환
     }
 
 }

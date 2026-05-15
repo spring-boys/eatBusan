@@ -1,4 +1,4 @@
-package com.ssafy.eatBusan.config;
+package com.ssafy.eatBusan.golbal.config;
 
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;

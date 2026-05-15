@@ -24,4 +24,6 @@ public class Place {
 
     private String menu;
 
+    protected Place() {}
+
 }
