@@ -19,7 +19,11 @@ public class MemberService {
         memberRepository.findMemberByEmail(memberRequestDto.email())
                 .orElseThrow(() -> new EBException(ErrorCode.MEMBER_DUPLICATE));
 
-        Member member = memberRepository.save(memberRequestDto.toEntity());
+        Member member = Member.builder()
+                .email(memberRequestDto.email())
+                .pw(memberRequestDto.password())
+                .build();
+
         return MemberResponseDto.from(member);
     }
 

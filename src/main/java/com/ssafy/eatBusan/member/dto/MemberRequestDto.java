@@ -6,8 +6,4 @@ public record MemberRequestDto(
         String email,
         String password
 ) {
-
-    public Member toEntity(){
-        return new Member(email, password);
-    }
 }
