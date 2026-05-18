@@ -3,9 +3,12 @@ package com.ssafy.eatBusan.place.Service;
 import com.ssafy.eatBusan.place.Repository.PlaceRepository;
 import com.ssafy.eatBusan.place.apiUtil.dto.KakaoSearchResponse;
 import com.ssafy.eatBusan.place.domain.Place;
+import com.ssafy.eatBusan.place.dto.PlaceResponseDto;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,12 +20,17 @@ public class PlaceService {
 
     private final PlaceRepository placeRepository;
 
+    private final PlaceAddressUtil placeAddressUtil;
+
     //TODO: 음식점 정보 (단순)저장
 
     //TODO: 음식점 조회
+    public Page<PlaceResponseDto> findPlaceByAreaCode(String areaCode, Pageable pageable){
+        return placeRepository.findPlaceByAreaCode(areaCode, pageable)
+                .map(PlaceResponseDto::from);
+    }
 
     //TODO: 음식점 이름으로 조회
-
 
     @Transactional
     public void saveNewPlace(KakaoSearchResponse kakaoSearchResponse) {
@@ -30,11 +38,14 @@ public class PlaceService {
                 .map(kakaoPlaceResponse -> kakaoPlaceResponse.code())
                 .toList();
 
+
+
         List<Place> placeList = kakaoSearchResponse.documents()
                 .stream()
                 .map(kakaoPlaceResponse -> Place.builder()
                         .code(kakaoPlaceResponse.code())
                         .name(kakaoPlaceResponse.name())
+                        .areaCode(placeAddressUtil.toAreaCode(kakaoPlaceResponse.address().split(" ")[1]))
                         .address(kakaoPlaceResponse.address())
                         .phone(kakaoPlaceResponse.phone())
                         .url(kakaoPlaceResponse.url())
@@ -44,8 +55,11 @@ public class PlaceService {
                 )
                 .toList();
 
-        placeRepository.saveAll(placeList);
+        kakaoSearchResponse.documents()
+                .stream()
+                .forEach(place -> System.out.println(placeAddressUtil.toAreaCode(place.address().split(" ")[1])));
 
+        placeRepository.saveAll(placeList);
     }
 
 
