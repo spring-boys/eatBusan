@@ -34,32 +34,32 @@ public class PlaceService {
 
     @Transactional
     public void saveNewPlace(KakaoSearchResponse kakaoSearchResponse) {
-        List<String> searchResult = kakaoSearchResponse.documents().stream()
+        List<String> placeList = kakaoSearchResponse.documents().stream()
                 .map(kakaoPlaceResponse -> kakaoPlaceResponse.code())
                 .toList();
 
-
-
-        List<Place> placeList = kakaoSearchResponse.documents()
+        List<String> existPlace = placeRepository.findPlacesByCodeList(placeList)
                 .stream()
-                .map(kakaoPlaceResponse -> Place.builder()
-                        .code(kakaoPlaceResponse.code())
-                        .name(kakaoPlaceResponse.name())
-                        .areaCode(placeAddressUtil.toAreaCode(kakaoPlaceResponse.address().split(" ")[1]))
-                        .address(kakaoPlaceResponse.address())
-                        .phone(kakaoPlaceResponse.phone())
-                        .url(kakaoPlaceResponse.url())
-                        .x(kakaoPlaceResponse.x())
-                        .y(kakaoPlaceResponse.y())
+                .map(place -> place.getCode())
+                .toList();
+
+        List<Place> newPlaceList = kakaoSearchResponse.documents()
+                .stream()
+                .filter(response -> !existPlace.contains(response.code()))
+                .map(response -> Place.builder()
+                        .code(response.code())
+                        .name(response.name())
+                        .areaCode(placeAddressUtil.toAreaCode(response.address().split(" ")[1]))
+                        .address(response.address())
+                        .phone(response.phone())
+                        .url(response.url())
+                        .x(response.x())
+                        .y(response.y())
                         .build()
                 )
                 .toList();
 
-        kakaoSearchResponse.documents()
-                .stream()
-                .forEach(place -> System.out.println(placeAddressUtil.toAreaCode(place.address().split(" ")[1])));
-
-        placeRepository.saveAll(placeList);
+        placeRepository.saveAll(newPlaceList);
     }
 
 
