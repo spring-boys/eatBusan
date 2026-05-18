@@ -1,0 +1,21 @@
+### 게시글 목록 조회
+GET http://localhost:8081/api/posts
+
+### 멤버 등록
+POST http://localhost:8081/api/members/join
+Content-Type: application/json
+
+{
+  "email": "test@test.com",
+  "password": "1234"
+}
+
+### 게시글 등록
+POST http://localhost:8081/api/posts/regist
+Content-Type: application/json
+
+{
+  "email": "test@test.com",
+  "title": "테스트제목",
+  "content": "테스트내용"
+}
