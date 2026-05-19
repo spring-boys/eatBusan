@@ -35,8 +35,8 @@ public class PlaceController {
 
     @GetMapping("/search")
     public void searchPlace(@RequestBody(required = false) PlaceRequestDto placeRequestDto) {
-        placeRequestDto = new PlaceRequestDto(129.05994, 35.15725);
-        kakaoApiUtil.searchPlaces(placeRequestDto.x(), placeRequestDto.y()); //결과를 list에 넣어서 반환
+        placeRequestDto = new PlaceRequestDto(129.05994, 35.15725, 1000);// mock
+        kakaoApiUtil.searchPlaces(placeRequestDto); //결과를 list에 넣어서 반환
     }
 
 }
