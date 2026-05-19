@@ -1,6 +1,7 @@
 package com.ssafy.eatBusan.post.domain;
 
 import com.ssafy.eatBusan.member.domain.Member;
+import com.ssafy.eatBusan.place.domain.Place;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,6 +27,10 @@ public class Post {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "place_id", nullable = false)
+    private Place place;
 
     @Column(nullable = false, length = 200)
     private String title;
