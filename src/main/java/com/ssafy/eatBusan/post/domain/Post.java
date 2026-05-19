@@ -54,5 +54,20 @@ public class Post {
     private LocalDateTime updatedAt;
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean deleted = false;
+
+    public void increaseViewCount() {
+        this.viewCount++;
+    }
+
+    public void update(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
+
+    public void delete() {
+        this.deleted = true;
+    }
+
 }

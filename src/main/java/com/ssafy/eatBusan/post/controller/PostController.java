@@ -20,8 +20,28 @@ public class PostController {
         return ResponseEntity.ok(postService.getAllPost());
     }
 
+
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostResponseDto> getPost(@PathVariable Long postId) {
+        return ResponseEntity.ok(postService.getPost(postId));
+    }
+
     @PostMapping("/regist")
     public ResponseEntity<PostResponseDto> registPost(@RequestBody PostRequireDto req) {
         return ResponseEntity.ok(postService.writePost(req));
+    }
+
+    @PatchMapping("/{postId}")
+    public ResponseEntity<PostResponseDto> updatePost(
+            @PathVariable Long postId,
+            @RequestBody PostRequireDto req
+    ) {
+        return ResponseEntity.ok(postService.updatePost(req, postId));
+    }
+
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<Void> deletePost(@PathVariable Long postId) {
+        postService.deletePost(postId);
+        return ResponseEntity.noContent().build();
     }
 }

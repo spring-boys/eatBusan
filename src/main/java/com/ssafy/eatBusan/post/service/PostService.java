@@ -24,6 +24,7 @@ public class PostService {
     public List<PostResponseDto> getAllPost() {
         return postRepository.findAllByDeletedFalse().stream()
                 .map(p -> new PostResponseDto(
+                        p.getId(),
                         p.getUser().getId(),
                         p.getUser().getEmail(),
                         p.getTitle(), p.getContent(),
@@ -39,5 +40,26 @@ public class PostService {
         Post post = Post.builder().user(member).title(req.title()).content(req.content()).build();
         postRepository.save(post);
         return PostResponseDto.from(post);
+    }
+
+    @Transactional
+    public PostResponseDto updatePost(PostRequireDto req, Long postId) {
+        Post post = postRepository.findByIdAndDeletedFalse(postId).orElseThrow(() -> new EBException(ErrorCode.MEMBER_NOT_FOUND));
+        post.update(req.title(), req.content());
+        return PostResponseDto.from(post);
+    }
+
+    @Transactional
+    public PostResponseDto getPost(Long id) {
+        // TODO: MEMBER NOT FOUND -> POST NOT FOUND로 변경
+        Post post = postRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> new EBException(ErrorCode.MEMBER_NOT_FOUND));
+        post.increaseViewCount();
+        return PostResponseDto.from(post);
+    }
+
+    @Transactional
+    public void deletePost(Long postId) {
+        Post post = postRepository.findByIdAndDeletedFalse(postId).orElseThrow(() -> new EBException(ErrorCode.MEMBER_NOT_FOUND));
+        post.delete();
     }
 }
