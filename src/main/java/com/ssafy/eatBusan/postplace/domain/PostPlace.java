@@ -40,6 +40,7 @@ public class PostPlace {
     private LocalDateTime updatedAt;
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean deleted = false;
 
 
