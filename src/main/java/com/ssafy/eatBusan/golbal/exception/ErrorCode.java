@@ -9,7 +9,11 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
 
     //Member
-    MEMBER_DUPLICATE(HttpStatus.CONFLICT, "이미 등록된 회원입니다"), MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "없는 회원입니다."), POST_NOT_FOUND(HttpStatus.NOT_FOUND,"없는 후기입니다");
+    MEMBER_DUPLICATE(HttpStatus.CONFLICT, "이미 등록된 회원입니다"),
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "없는 회원입니다."),
+
+    //auth
+    AUTH_INVALID_LOGIN(HttpStatus.UNAUTHORIZED, "ID/PW가 틀렸습니다.");
 
     private final HttpStatus status;
     private final String message;

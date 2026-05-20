@@ -8,7 +8,6 @@ import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -25,7 +24,7 @@ public class JWTUtil{
 
     public JWTUtil(
             @Value("${jwt.secret.key}") String secret,
-            @Value("${jwt.access.time") long accessTokenTime,
+            @Value("${jwt.access.time}") long accessTokenTime,
             @Value("${jwt.refresh.time}") long refreshTokenTime
     ) {
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
@@ -33,7 +32,17 @@ public class JWTUtil{
         this.refreshTokenTime = refreshTokenTime;
     }
 
-    public String createToken(Member member, Long timePeriod, TokenType tokenType){
+    public String createToken(Member member, TokenType tokenType){
+
+        Long timePeriod = 0L;
+
+        if(TokenType.ACCESS.getType().equals(tokenType.getType())){
+            timePeriod = accessTokenTime;
+        }
+        else{
+            timePeriod = refreshTokenTime;
+        }
+
         Date now = new Date();
         Date expire = new Date(now.getTime() + timePeriod);
 

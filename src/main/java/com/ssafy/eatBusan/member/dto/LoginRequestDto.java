@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Email;
 
 public record LoginRequestDto(
         @Email
-        Long email,
+        String email,
 
         String password
 )
