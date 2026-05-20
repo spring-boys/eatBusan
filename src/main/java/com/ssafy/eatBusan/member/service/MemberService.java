@@ -3,6 +3,7 @@ package com.ssafy.eatBusan.member.service;
 import com.ssafy.eatBusan.golbal.exception.EBException;
 import com.ssafy.eatBusan.golbal.exception.ErrorCode;
 import com.ssafy.eatBusan.member.domain.Member;
+import com.ssafy.eatBusan.member.dto.LoginRequestDto;
 import com.ssafy.eatBusan.member.dto.MemberRequestDto;
 import com.ssafy.eatBusan.member.dto.MemberResponseDto;
 import com.ssafy.eatBusan.member.repository.MemberRepository;
@@ -27,6 +28,10 @@ public class MemberService {
                 .build();
 
         return MemberResponseDto.from(memberRepository.save(member));
+    }
+
+    public MemberResponseDto login(LoginRequestDto loginRequestDto){
+        memberRepository.
     }
 
 

@@ -26,8 +26,8 @@ public class MemberController {
     }
 
     //TODO : 로그인
-    public void login(){
-
+    public void login(@Valid @RequestBody LoginRequestDto requestDto){
+        memberService.
     }
 
     //TODO : 로그아웃
