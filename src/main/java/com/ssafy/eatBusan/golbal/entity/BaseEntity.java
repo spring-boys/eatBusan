@@ -16,16 +16,16 @@ import java.time.LocalDateTime;
 public abstract class BaseEntity {
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
-    private LocalDateTime created;
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(nullable = false)
-    private LocalDateTime updated;
+    private LocalDateTime updatedAt;
 
     @Column(columnDefinition = "bit(1) NOT NULL DEFAULT b'0'", nullable = false)
     private boolean deleted;
 
-    public void softDelete()    {
+    public void delete()    {
         this.deleted = true;
     }
 }
