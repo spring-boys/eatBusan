@@ -13,9 +13,7 @@ public class PostLikeController {
     private final PostLikeService postLikeService;
 
     @PostMapping("/{postId}/likes")
-    public ResponseEntity<Void> like(
-            @PathVariable Long postId,
-            @RequestParam Long memberId) {
+    public ResponseEntity<Void> like(@PathVariable Long postId, @RequestParam Long memberId) {
         if (postLikeService.like(postId, memberId)) {
             return ResponseEntity.status(HttpStatus.CREATED).build();
         }
