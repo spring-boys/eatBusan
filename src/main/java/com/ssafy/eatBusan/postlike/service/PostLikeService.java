@@ -26,7 +26,6 @@ public class PostLikeService {
     /**
      * FIXME: [Race Condition] post.likeCount 갱신은 JPA dirty checking 기반으로
      *   동시 요청 시 Lost Update 발생 가능 — Redis INCR(원자 연산)로 해결 예정.
-     *   docs/REDIS_LIKE_GOAL.md 참고.
      */
     @Transactional
     public boolean like(Long postId, Long memberId) {
