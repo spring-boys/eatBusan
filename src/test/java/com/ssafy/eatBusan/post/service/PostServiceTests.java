@@ -1,6 +1,6 @@
 package com.ssafy.eatBusan.post.service;
 
-import com.ssafy.eatBusan.golbal.exception.EBException;
+import com.ssafy.eatBusan.global.exception.EBException;
 import com.ssafy.eatBusan.member.domain.Member;
 import com.ssafy.eatBusan.member.repository.MemberRepository;
 import com.ssafy.eatBusan.place.Repository.PlaceRepository;

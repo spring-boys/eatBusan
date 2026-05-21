@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-
 public class RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;

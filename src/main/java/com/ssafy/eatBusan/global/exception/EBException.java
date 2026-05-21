@@ -1,4 +1,4 @@
-package com.ssafy.eatBusan.golbal.exception;
+package com.ssafy.eatBusan.global.exception;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

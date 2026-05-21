@@ -1,4 +1,4 @@
-package com.ssafy.eatBusan.golbal.exception;
+package com.ssafy.eatBusan.global.exception;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,11 @@ public enum ErrorCode {
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "없는 회원입니다."),
 
     //auth
-    AUTH_INVALID_LOGIN(HttpStatus.UNAUTHORIZED, "ID/PW가 틀렸습니다.");
+    AUTH_INVALID_LOGIN(HttpStatus.UNAUTHORIZED, "ID/PW가 틀렸습니다."),
+
+    //jwt
+    TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "토큰이 없습니다."),
+    TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰립니다.");
 
     private final HttpStatus status;
     private final String message;

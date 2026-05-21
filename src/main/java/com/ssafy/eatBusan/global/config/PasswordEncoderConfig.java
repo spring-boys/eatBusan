@@ -1,4 +1,4 @@
-package com.ssafy.eatBusan.golbal.config;
+package com.ssafy.eatBusan.global.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
