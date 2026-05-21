@@ -9,6 +9,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+      issues: write
       id-token: write
     steps:
       - uses: actions/checkout@v4
@@ -17,6 +18,8 @@ jobs:
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_args: |
+            --model sonnet
           prompt: |
             당신은 이 프로젝트를 처음부터 함께 설계한 시니어 리뷰어입니다.
             아래 컨텍스트를 완전히 숙지한 상태로, 이 PR에서 **실제로 변경된 코드**만 리뷰하세요.
@@ -313,3 +316,9 @@ jobs:
             - 아무 문제 없으면 "[특이사항 없음]" + 한 줄 요약만
             
             변경된 코드만 꼼꼼히 읽고, 위 항목 중 실제로 해당하는 것만 한국어로 작성하세요.
+            
+            중요:
+            - 리뷰 결과는 반드시 PR Conversation에 댓글로 작성하세요.
+            - 라인별 지적사항이 있으면 inline comment를 사용하세요.
+            - 라인별 지적사항이 없더라도 `[특이사항 없음]`과 변경 요약을 일반 PR comment로 남기세요.
+            - 아무 출력 없이 종료하지 마세요.
