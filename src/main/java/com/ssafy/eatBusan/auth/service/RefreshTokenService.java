@@ -3,6 +3,8 @@ package com.ssafy.eatBusan.auth.service;
 import com.ssafy.eatBusan.auth.domain.RefreshToken;
 import com.ssafy.eatBusan.auth.dto.RefreshTokenResponseDto;
 import com.ssafy.eatBusan.auth.repository.RefreshTokenRepository;
+import com.ssafy.eatBusan.global.exception.EBException;
+import com.ssafy.eatBusan.global.exception.ErrorCode;
 import com.ssafy.eatBusan.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +24,12 @@ public class RefreshTokenService {
         refreshTokenRepository.deleteRefreshTokenByMemberId(member.getId());
         RefreshToken token = refreshTokenRepository.save(new RefreshToken(member, refreshToken));
         return RefreshTokenResponseDto.from(token);
+    }
+
+    public RefreshTokenResponseDto findRefreshTokenByMemberId(Long memberId){
+        RefreshToken rtoken = refreshTokenRepository.findRefreshTokenByMemberId(memberId)
+                .orElseThrow(() -> new EBException(ErrorCode.TOKEN_INVALID));
+        return RefreshTokenResponseDto.from(rtoken);
     }
 
     public void deleteRefreshTokenByMemberId(Long memberId){

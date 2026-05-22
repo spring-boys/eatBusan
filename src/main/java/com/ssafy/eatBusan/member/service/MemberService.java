@@ -1,6 +1,7 @@
 package com.ssafy.eatBusan.member.service;
 
 import com.ssafy.eatBusan.auth.domain.TokenType;
+import com.ssafy.eatBusan.auth.dto.RefreshTokenResponseDto;
 import com.ssafy.eatBusan.auth.service.RefreshTokenService;
 import com.ssafy.eatBusan.auth.util.CookieUtil;
 import com.ssafy.eatBusan.auth.util.JWTUtil;
@@ -66,15 +67,16 @@ public class MemberService {
     public void refreshToken(HttpServletRequest request, HttpServletResponse response){
 
         //refreshToken을 기반으로 id 조회
-        String refreshToken = cookieUtil.getRefreshToken(request).orElseThrow(() -> new EBException(ErrorCode.RTOKEN_NOT_FOUND));
-
-        System.out.println("1refreshToken = " + refreshToken);
+        String refreshToken = cookieUtil.getRefreshToken(request).orElseThrow(() -> new EBException(ErrorCode.RTOKEN_COOKIE_NOT_FOUND));
 
         //refreshToken 검증 및 id 추출
         if(!jwtUtil.validateToken(refreshToken, TokenType.REFRESH)) throw new EBException(ErrorCode.RTOKEN_INVALID);
         Long memberId = jwtUtil.getId(refreshToken, TokenType.REFRESH);
 
         //기존 refreshToken 삭제 및 새로운 토큰 발급
+        RefreshTokenResponseDto curRefreshToken = refreshTokenService.findRefreshTokenByMemberId(memberId);
+        if(!curRefreshToken.refreshToken().equals(refreshToken)) throw new EBException(ErrorCode.RTOKEN_MISMATCH);
+
         refreshTokenService.deleteRefreshTokenByMemberId(memberId);
         Member member = memberRepository.getReferenceById(memberId);
         saveAccessToken(member, response);
