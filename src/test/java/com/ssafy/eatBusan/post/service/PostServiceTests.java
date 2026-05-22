@@ -3,6 +3,8 @@ package com.ssafy.eatBusan.post.service;
 import com.ssafy.eatBusan.golbal.exception.EBException;
 import com.ssafy.eatBusan.member.domain.Member;
 import com.ssafy.eatBusan.member.repository.MemberRepository;
+import com.ssafy.eatBusan.place.Repository.PlaceRepository;
+import com.ssafy.eatBusan.place.domain.Place;
 import com.ssafy.eatBusan.post.domain.Post;
 import com.ssafy.eatBusan.post.dto.PostRequireDto;
 import com.ssafy.eatBusan.post.dto.PostResponseDto;
@@ -18,7 +20,10 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SpringBootTest
+@SpringBootTest(properties = {
+        "spring.datasource.url=jdbc:mysql://localhost:3306/eatbusan_test?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true",
+        "spring.jpa.hibernate.ddl-auto=create-drop"
+})
 @Transactional
 class PostServiceTests {
 
@@ -33,11 +38,26 @@ class PostServiceTests {
     @Autowired
     private MemberRepository memberRepository;
 
+    @Autowired
+    private PlaceRepository placeRepository;
+
+    private Place place;
+
     @BeforeEach
     void setUp() {
         memberRepository.save(Member.builder()
                 .email(MEMBER_EMAIL)
                 .pw("1234")
+                .build());
+
+        place = placeRepository.save(Place.builder()
+                .code("place-code")
+                .name("테스트 가게")
+                .address("부산")
+                .phone("051-0000-0000")
+                .url("https://place.example.com")
+                .x(129.0)
+                .y(35.0)
                 .build());
     }
 
@@ -49,6 +69,7 @@ class PostServiceTests {
 
         assertThat(response.postId()).isNotNull();
         assertThat(response.email()).isEqualTo(MEMBER_EMAIL);
+        assertThat(response.placeId()).isEqualTo(place.getId());
         assertThat(response.title()).isEqualTo("testTitle");
         assertThat(response.content()).isEqualTo("testContent");
         assertThat(response.viewCount()).isZero();
@@ -88,10 +109,12 @@ class PostServiceTests {
         PostResponseDto updated = postService.updatePost(updateReq, created.postId());
 
         assertThat(updated.postId()).isEqualTo(created.postId());
+        assertThat(updated.placeId()).isEqualTo(place.getId());
         assertThat(updated.title()).isEqualTo("newTitle");
         assertThat(updated.content()).isEqualTo("newContent");
 
         Post post = postRepository.findByIdAndDeletedFalse(created.postId()).orElseThrow();
+        assertThat(post.getPlace().getId()).isEqualTo(place.getId());
         assertThat(post.getTitle()).isEqualTo("newTitle");
         assertThat(post.getContent()).isEqualTo("newContent");
     }
@@ -117,6 +140,6 @@ class PostServiceTests {
     }
 
     private PostRequireDto createRequest(String title, String content) {
-        return new PostRequireDto(null, MEMBER_EMAIL, title, content);
+        return new PostRequireDto(null, place.getId(), MEMBER_EMAIL, title, content);
     }
 }

@@ -1,5 +1,6 @@
 package com.ssafy.eatBusan.post.domain;
 
+import com.ssafy.eatBusan.golbal.entity.BaseEntity;
 import com.ssafy.eatBusan.member.domain.Member;
 import com.ssafy.eatBusan.place.domain.Place;
 import jakarta.persistence.*;
@@ -7,10 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "post")
@@ -18,7 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Post {
+public class Post extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,18 +47,6 @@ public class Post {
     @Builder.Default
     private int commentCount = 0;
 
-    @CreationTimestamp
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
-
-    @Column(nullable = false)
-    @Builder.Default
-    private boolean deleted = false;
-
     public void increaseViewCount() {
         this.viewCount++;
     }
@@ -71,8 +56,19 @@ public class Post {
         this.content = content;
     }
 
-    public void delete() {
-        this.deleted = true;
+    public void increaseLikeCount() {
+        this.likeCount++;
     }
 
+    public void decreaseLikeCount() {
+        this.likeCount--;
+    }
+
+    public void increaseCommentCount() {
+        this.commentCount++;
+    }
+
+    public void decreaseCommentCount() {
+        this.commentCount--;
+    }
 }

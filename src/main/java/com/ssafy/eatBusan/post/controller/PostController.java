@@ -26,8 +26,8 @@ public class PostController {
         return ResponseEntity.ok(postService.getPost(postId));
     }
 
-    @PostMapping("/regist")
-    public ResponseEntity<PostResponseDto> registPost(@RequestBody PostRequireDto req) {
+    @PostMapping
+    public ResponseEntity<PostResponseDto> createPost(@RequestBody PostRequireDto req) {
         return ResponseEntity.ok(postService.writePost(req));
     }
 
