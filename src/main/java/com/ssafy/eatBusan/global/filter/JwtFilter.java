@@ -1,5 +1,6 @@
 package com.ssafy.eatBusan.global.filter;
 
+import com.ssafy.eatBusan.auth.domain.TokenType;
 import com.ssafy.eatBusan.auth.util.JWTUtil;
 import com.ssafy.eatBusan.global.exception.ErrorCode;
 import jakarta.servlet.Filter;
@@ -60,7 +61,7 @@ public class JwtFilter implements Filter {
 
         token = token.substring(7);
         System.out.println(token);
-        if (!jwtUtil.validateToken(token)) {
+        if (!jwtUtil.validateToken(token, TokenType.ACCESS)) {
             sendErrorResponse(httpServletResponse, ErrorCode.TOKEN_INVALID); // 토큰이 유효하지 않은 경우
             return;
         }

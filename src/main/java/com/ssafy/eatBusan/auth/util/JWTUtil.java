@@ -55,11 +55,10 @@ public class JWTUtil{
                 .compact();
     }
 
-    public boolean validateToken(String token){
+    public boolean validateToken(String token, TokenType tokenType){
         try{
             Claims claims = getClaims(token);
-            if(TokenType.ACCESS.getType().equals(claims.get("tokenType"))){
-                System.out.println("here!!");
+            if(tokenType.getType().equals(claims.get("tokenType"))){
                 return false;
             }
             //정상적인 토큰의 경우 만료가 되었는지 안되었는지만을 확인하면 됨

@@ -1,5 +1,6 @@
 package com.ssafy.eatBusan.member.service;
 
+import com.ssafy.eatBusan.auth.domain.RefreshToken;
 import com.ssafy.eatBusan.auth.domain.TokenType;
 import com.ssafy.eatBusan.auth.service.RefreshTokenService;
 import com.ssafy.eatBusan.auth.util.CookieUtil;
@@ -12,6 +13,7 @@ import com.ssafy.eatBusan.member.dto.MemberDto;
 import com.ssafy.eatBusan.member.dto.MemberRequestDto;
 import com.ssafy.eatBusan.member.dto.MemberResponseDto;
 import com.ssafy.eatBusan.member.repository.MemberRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -61,6 +63,22 @@ public class MemberService {
         refreshTokenService.deleteRefreshTokenByMemberId(memberDto.id());
     }
 
+    @Transactional
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response){
+
+        //refreshToken을 기반으로 id 조회
+        String refreshToken = cookieUtil.getRefreshToken(request).orElseThrow(() -> new EBException(ErrorCode.RTOKEN_NOT_FOUND));
+
+        //refreshToken 검증 및 id 추출
+        if(!jwtUtil.validateToken(refreshToken, TokenType.REFRESH)) throw new EBException(ErrorCode.RTOKEN_NOT_FOUND);
+        Long memberId = jwtUtil.getId(refreshToken);
+
+        //기존 refreshToken 삭제 및 새로운 토큰 발급
+        refreshTokenService.deleteRefreshTokenByMemberId(memberId);
+        Member member = memberRepository.getReferenceById(memberId);
+        saveAccessToken(member, response);
+        saveRefreshToken(member, response);
+    }
 
     private void saveAccessToken(Member member, HttpServletResponse response){
         String accessToken = jwtUtil.createToken(member, TokenType.ACCESS);

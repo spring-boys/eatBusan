@@ -1,11 +1,14 @@
 package com.ssafy.eatBusan.member.controller;
 
+import com.ssafy.eatBusan.auth.dto.RefreshTokenResponseDto;
 import com.ssafy.eatBusan.auth.resolver.LoginMember;
+import com.ssafy.eatBusan.auth.service.RefreshTokenService;
 import com.ssafy.eatBusan.member.dto.LoginRequestDto;
 import com.ssafy.eatBusan.member.dto.MemberDto;
 import com.ssafy.eatBusan.member.dto.MemberRequestDto;
 import com.ssafy.eatBusan.member.dto.MemberResponseDto;
 import com.ssafy.eatBusan.member.service.MemberService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController {
 
     private final MemberService memberService;
+    private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/join")
     public ResponseEntity<MemberResponseDto> join(@RequestBody MemberRequestDto memberRequestDto){
@@ -42,6 +46,12 @@ public class MemberController {
     public ResponseEntity<Void> logout(@LoginMember MemberDto member, HttpServletResponse httpResponse){
         memberService.logout(member, httpResponse);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<Void> refreshToken(HttpServletRequest request, HttpServletResponse response){
+        memberService.refreshToken(request, response);
+        return ResponseEntity.noContent().build();
     }
 
 }

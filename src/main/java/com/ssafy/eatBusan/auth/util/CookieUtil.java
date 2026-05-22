@@ -1,6 +1,10 @@
 package com.ssafy.eatBusan.auth.util;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Arrays;
+import java.util.Optional;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +26,20 @@ public class CookieUtil {
                 .maxAge(0)
                 .build();
         response.addHeader("Set-Cookie", cookie.toString());
+    }
+
+    public Optional<String> getRefreshToken(HttpServletRequest request){
+        Cookie[] cookies = request.getCookies();
+
+        if(cookies == null) return Optional.empty();
+
+        for(Cookie cookie : cookies) {
+            if (cookie.getName().equals("EBRefreshToken")) {
+                return Optional.of(cookie.getValue());
+            }
+        }
+
+        return Optional.empty();
     }
 
 }
