@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/postlike")
+@RequestMapping("/api/posts")
 @RequiredArgsConstructor
 public class PostLikeController {
     private final PostLikeService postLikeService;
