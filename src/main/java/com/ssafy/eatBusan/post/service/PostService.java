@@ -10,11 +10,10 @@ import com.ssafy.eatBusan.post.domain.Post;
 import com.ssafy.eatBusan.post.dto.PostRequireDto;
 import com.ssafy.eatBusan.post.dto.PostResponseDto;
 import com.ssafy.eatBusan.post.repository.PostRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @Transactional(readOnly = true)

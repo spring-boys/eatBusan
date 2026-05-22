@@ -1,6 +1,5 @@
 package com.ssafy.eatBusan.member.service;
 
-import com.ssafy.eatBusan.auth.domain.RefreshToken;
 import com.ssafy.eatBusan.auth.domain.TokenType;
 import com.ssafy.eatBusan.auth.service.RefreshTokenService;
 import com.ssafy.eatBusan.auth.util.CookieUtil;
@@ -69,9 +68,11 @@ public class MemberService {
         //refreshToken을 기반으로 id 조회
         String refreshToken = cookieUtil.getRefreshToken(request).orElseThrow(() -> new EBException(ErrorCode.RTOKEN_NOT_FOUND));
 
+        System.out.println("1refreshToken = " + refreshToken);
+
         //refreshToken 검증 및 id 추출
-        if(!jwtUtil.validateToken(refreshToken, TokenType.REFRESH)) throw new EBException(ErrorCode.RTOKEN_NOT_FOUND);
-        Long memberId = jwtUtil.getId(refreshToken);
+        if(!jwtUtil.validateToken(refreshToken, TokenType.REFRESH)) throw new EBException(ErrorCode.RTOKEN_INVALID);
+        Long memberId = jwtUtil.getId(refreshToken, TokenType.REFRESH);
 
         //기존 refreshToken 삭제 및 새로운 토큰 발급
         refreshTokenService.deleteRefreshTokenByMemberId(memberId);

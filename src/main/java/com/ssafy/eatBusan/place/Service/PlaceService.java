@@ -1,12 +1,10 @@
 package com.ssafy.eatBusan.place.Service;
 
 import com.ssafy.eatBusan.place.Repository.PlaceRepository;
-import com.ssafy.eatBusan.place.apiUtil.KakaoApiUtil;
 import com.ssafy.eatBusan.place.apiUtil.dto.KakaoSearchResponse;
 import com.ssafy.eatBusan.place.domain.Place;
 import com.ssafy.eatBusan.place.dto.PlaceResponseDto;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

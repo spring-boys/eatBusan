@@ -36,7 +36,7 @@ public class JWTUtil{
 
         Long timePeriod = 0L;
 
-        if(TokenType.ACCESS.getType().equals(tokenType.getType())){
+        if((tokenType == TokenType.ACCESS)){
             timePeriod = accessTokenTime;
         }
         else{
@@ -57,8 +57,11 @@ public class JWTUtil{
 
     public boolean validateToken(String token, TokenType tokenType){
         try{
+            if(tokenType == TokenType.ACCESS) {
+                token = token.substring(7);
+            }
             Claims claims = getClaims(token);
-            if(tokenType.getType().equals(claims.get("tokenType"))){
+            if(!tokenType.getType().equals(claims.get("tokenType"))){
                 return false;
             }
             //정상적인 토큰의 경우 만료가 되었는지 안되었는지만을 확인하면 됨
@@ -76,8 +79,10 @@ public class JWTUtil{
                 .getPayload();
     }
 
-    public Long getId(String token){
-        token = token.substring(7);
+    public Long getId(String token, TokenType tokenType){
+        if(tokenType == TokenType.ACCESS) {
+            token = token.substring(7);
+        }
         return Jwts.parser()
                 .verifyWith(secretKey)
                 .build()

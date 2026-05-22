@@ -1,5 +1,6 @@
 package com.ssafy.eatBusan.auth.resolver;
 
+import com.ssafy.eatBusan.auth.domain.TokenType;
 import com.ssafy.eatBusan.auth.util.JWTUtil;
 import com.ssafy.eatBusan.member.dto.MemberDto;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,7 +31,7 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
 
         //MemberDto에 사용자 정보 집어 넣기
         String token = request.getHeader("Authorization");
-        Long id = jwtUtil.getId(token);
+        Long id = jwtUtil.getId(token, TokenType.ACCESS);
         return new MemberDto(id);
     }
 }

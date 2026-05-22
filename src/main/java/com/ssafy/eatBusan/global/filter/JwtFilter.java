@@ -26,6 +26,7 @@ public class JwtFilter implements Filter {
     private static final String [] WHITE_LIST = {
             "/api/members/login",
             "/api/members/join",
+            "/api/members/refresh",
             "/api/posts/**"
     };
 
@@ -59,8 +60,6 @@ public class JwtFilter implements Filter {
             return;
         }
 
-        token = token.substring(7);
-        System.out.println(token);
         if (!jwtUtil.validateToken(token, TokenType.ACCESS)) {
             sendErrorResponse(httpServletResponse, ErrorCode.TOKEN_INVALID); // 토큰이 유효하지 않은 경우
             return;
