@@ -11,18 +11,23 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
-@Transactional(readOnly = true)
+@Transactional
 @RequiredArgsConstructor
 public class RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
 
     //TODO: refreshToken 저장 시, 암호화해서 저장해보기?,,
-    @Transactional
     public RefreshTokenResponseDto saveRefreshToken(Member member, String refreshToken){
         refreshTokenRepository.deleteRefreshTokenByMemberId(member.getId());
         RefreshToken token = refreshTokenRepository.save(new RefreshToken(member, refreshToken));
         return RefreshTokenResponseDto.from(token);
     }
+
+    public void deleteRefreshTokenByMemberId(Long memberId){
+        refreshTokenRepository.deleteRefreshTokenByMemberId(memberId);
+    }
+
+
 
 }

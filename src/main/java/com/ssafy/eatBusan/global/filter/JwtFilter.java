@@ -59,6 +59,7 @@ public class JwtFilter implements Filter {
         }
 
         token = token.substring(7);
+        System.out.println(token);
         if (!jwtUtil.validateToken(token)) {
             sendErrorResponse(httpServletResponse, ErrorCode.TOKEN_INVALID); // 토큰이 유효하지 않은 경우
             return;

@@ -8,6 +8,7 @@ import com.ssafy.eatBusan.global.exception.EBException;
 import com.ssafy.eatBusan.global.exception.ErrorCode;
 import com.ssafy.eatBusan.member.domain.Member;
 import com.ssafy.eatBusan.member.dto.LoginRequestDto;
+import com.ssafy.eatBusan.member.dto.MemberDto;
 import com.ssafy.eatBusan.member.dto.MemberRequestDto;
 import com.ssafy.eatBusan.member.dto.MemberResponseDto;
 import com.ssafy.eatBusan.member.repository.MemberRepository;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MemberService {
 
@@ -41,6 +43,7 @@ public class MemberService {
         return MemberResponseDto.from(savedMember);
     }
 
+    @Transactional
     public void login(LoginRequestDto loginRequestDto, HttpServletResponse response){
         Member member = memberRepository.findMemberByEmail(loginRequestDto.email())
                 .orElseThrow(() -> new EBException(ErrorCode.AUTH_INVALID_LOGIN));
@@ -50,6 +53,12 @@ public class MemberService {
         }
         saveAccessToken(member, response);
         saveRefreshToken(member, response);
+    }
+
+    @Transactional
+    public void logout(MemberDto memberDto, HttpServletResponse response){
+        cookieUtil.invalidateRefreshToken(response);
+        refreshTokenService.deleteRefreshTokenByMemberId(memberDto.id());
     }
 
 
@@ -65,7 +74,6 @@ public class MemberService {
         cookieUtil.saveRefreshToken(refreshToken, response);
         refreshTokenService.saveRefreshToken(member, refreshToken);
     }
-
 
 
 }

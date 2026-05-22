@@ -1,7 +1,8 @@
 package com.ssafy.eatBusan.member.controller;
 
-import com.ssafy.eatBusan.auth.util.JWTUtil;
+import com.ssafy.eatBusan.auth.resolver.LoginMember;
 import com.ssafy.eatBusan.member.dto.LoginRequestDto;
+import com.ssafy.eatBusan.member.dto.MemberDto;
 import com.ssafy.eatBusan.member.dto.MemberRequestDto;
 import com.ssafy.eatBusan.member.dto.MemberResponseDto;
 import com.ssafy.eatBusan.member.service.MemberService;
@@ -22,9 +23,6 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    private final JWTUtil jwtUtil;
-
-    //TODO: 회원 가입
     @PostMapping("/join")
     public ResponseEntity<MemberResponseDto> join(@RequestBody MemberRequestDto memberRequestDto){
         MemberResponseDto memberResponseDto = memberService.join(memberRequestDto);
@@ -40,10 +38,10 @@ public class MemberController {
        return ResponseEntity.ok().build();
     }
 
-    //TODO : 로그아웃
-    public void logout(){
-
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@LoginMember MemberDto member, HttpServletResponse httpResponse){
+        memberService.logout(member, httpResponse);
+        return ResponseEntity.ok().build();
     }
-
 
 }
