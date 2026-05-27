@@ -1,7 +1,7 @@
 package com.ssafy.eatBusan.post.service;
 
-import com.ssafy.eatBusan.golbal.exception.EBException;
-import com.ssafy.eatBusan.golbal.exception.ErrorCode;
+import com.ssafy.eatBusan.global.exception.EBException;
+import com.ssafy.eatBusan.global.exception.ErrorCode;
 import com.ssafy.eatBusan.member.domain.Member;
 import com.ssafy.eatBusan.member.repository.MemberRepository;
 import com.ssafy.eatBusan.place.Repository.PlaceRepository;
@@ -10,11 +10,10 @@ import com.ssafy.eatBusan.post.domain.Post;
 import com.ssafy.eatBusan.post.dto.PostRequireDto;
 import com.ssafy.eatBusan.post.dto.PostResponseDto;
 import com.ssafy.eatBusan.post.repository.PostRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @Transactional(readOnly = true)

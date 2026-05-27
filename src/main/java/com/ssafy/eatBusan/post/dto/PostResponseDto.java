@@ -1,8 +1,6 @@
 package com.ssafy.eatBusan.post.dto;
 
-import com.ssafy.eatBusan.member.domain.Member;
 import com.ssafy.eatBusan.post.domain.Post;
-
 import java.time.LocalDateTime;
 
 public record PostResponseDto(Long postId, Long userId, Long placeId, String email, String title, String content,

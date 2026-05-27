@@ -1,18 +1,17 @@
 package com.ssafy.eatBusan.postlike.service;
 
-import com.ssafy.eatBusan.golbal.exception.EBException;
-import com.ssafy.eatBusan.golbal.exception.ErrorCode;
+import com.ssafy.eatBusan.global.exception.EBException;
+import com.ssafy.eatBusan.global.exception.ErrorCode;
 import com.ssafy.eatBusan.member.domain.Member;
 import com.ssafy.eatBusan.member.repository.MemberRepository;
 import com.ssafy.eatBusan.post.domain.Post;
 import com.ssafy.eatBusan.post.repository.PostRepository;
 import com.ssafy.eatBusan.postlike.domain.PostLike;
 import com.ssafy.eatBusan.postlike.repository.PostLikeRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
