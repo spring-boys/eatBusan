@@ -24,10 +24,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController {
 
     private final MemberService memberService;
-    private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/join")
-    public ResponseEntity<MemberResponseDto> join(@RequestBody MemberRequestDto memberRequestDto){
+    public ResponseEntity<Void> join(@RequestBody MemberRequestDto memberRequestDto){
         MemberResponseDto memberResponseDto = memberService.join(memberRequestDto);
         return ResponseEntity.created(URI.create(String.format("/api/members/%d", memberResponseDto.id()))).build();
     }
