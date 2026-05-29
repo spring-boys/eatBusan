@@ -49,7 +49,7 @@ public class PostLikeCacheService {
         }
     }
 
-    public boolean checkLiked(Long postId, Long memberId){
+    public boolean checkLiked(Long postId, Long memberId) {
         return Boolean.TRUE.equals(redisTemplate.opsForSet().isMember(likeKey(postId), String.valueOf(memberId)));
     }
 
@@ -58,7 +58,6 @@ public class PostLikeCacheService {
         return count != null ? count : 0L;
     }
 
-
     private String likeKey(Long postId) {
         return "post:likes:" + postId;
     }
@@ -66,4 +65,24 @@ public class PostLikeCacheService {
     private String initKey(Long postId) {
         return "post:likes:" + postId + ":init";
     }
+
+    private String lockKey(Long postId) {
+        return "post:likes:" + postId + ":lock";
+    }
+
+    private void witUntilBootstrapped(Long postId){
+        for(int i = 0 ; i < 5 ; i++){
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException(e);
+            }
+        }
+        if(Boolean.TRUE.equals(redisTemplate.hasKey(initKey(postId)))){
+            return;
+        }
+        throw new RuntimeException("Redis bootstrap timeout");
+    }
+
 }

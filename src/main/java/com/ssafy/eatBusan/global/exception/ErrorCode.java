@@ -29,7 +29,10 @@ public enum ErrorCode {
     POST_NOT_FOUND(HttpStatus.NOT_FOUND,"없는 후기입니다"),
 
     //place
-    PLACE_NOT_FOUND(HttpStatus.NOT_FOUND, "없는 식당입니다.");
+    PLACE_NOT_FOUND(HttpStatus.NOT_FOUND, "없는 식당입니다."),
+
+    //redis
+    REDIS_BOOTSTRAP_TIMEOUT(HttpStatus.SERVICE_UNAVAILABLE, "좋아요 캐시 초기화 중입니다. 잠시 후 다시 시도해주세요.");
 
     private final HttpStatus status;
     private final String message;
