@@ -26,7 +26,10 @@ public enum ErrorCode {
     RTOKEN_MISMATCH(HttpStatus.UNAUTHORIZED, "Refresh 토큰이 일치하지 않습니다."),
 
     //post
-    POST_NOT_FOUND(HttpStatus.NOT_FOUND,"없는 후기입니다");
+    POST_NOT_FOUND(HttpStatus.NOT_FOUND,"없는 후기입니다"),
+
+    //place
+    PLACE_NOT_FOUND(HttpStatus.NOT_FOUND, "없는 식당입니다.");
 
     private final HttpStatus status;
     private final String message;

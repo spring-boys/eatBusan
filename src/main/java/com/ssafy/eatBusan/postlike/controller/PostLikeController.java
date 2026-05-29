@@ -1,5 +1,6 @@
 package com.ssafy.eatBusan.postlike.controller;
 
+import com.ssafy.eatBusan.postlike.dto.PostLikeResponse;
 import com.ssafy.eatBusan.postlike.service.PostLikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,10 +18,9 @@ public class PostLikeController {
     private final PostLikeService postLikeService;
 
     @PostMapping("/{postId}/likes")
-    public ResponseEntity<Void> like(@PathVariable Long postId, @RequestParam Long memberId) {
-        if (postLikeService.like(postId, memberId)) {
-            return ResponseEntity.status(HttpStatus.CREATED).build();
-        }
-        return ResponseEntity.status(HttpStatus.OK).build();
+    public ResponseEntity<PostLikeResponse> like(@PathVariable Long postId, @RequestParam Long memberId) {
+        PostLikeResponse postLikeResponse = postLikeService.like(postId, memberId);
+        // 토글의 경우 200으로 일괄 처리하되, ResponseDTO를 통해 현재 상태를 넘겨줌
+        return ResponseEntity.status(HttpStatus.OK).body(postLikeResponse);
     }
 }

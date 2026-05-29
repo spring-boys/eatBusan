@@ -1,0 +1,8 @@
+### 좋아요 토글 (추가/취소)
+POST http://localhost:8081/api/posts/1/likes?memberId=1
+
+### 좋아요 토글 (다른 멤버)
+POST http://localhost:8081/api/posts/1/likes?memberId=2
+
+### 존재하지 않는 게시글 좋아요 (404 예상)
+POST http://localhost:8081/api/posts/9999/likes?memberId=1
