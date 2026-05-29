@@ -1,0 +1,176 @@
+// EatBusan ERD — dbdiagram.io 용
+// 사용법: https://dbdiagram.io/d 에서 이 내용을 붙여넣기
+
+Table district {
+  id bigint [pk, increment]
+  code varchar(30) [unique, not null]
+  name varchar(50) [unique, not null]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted bit [not null, default: 0]
+}
+
+Table excellent_place {
+  id bigint [pk, increment]
+  district_id bigint [not null, ref: > district.id]
+  source_id varchar(100) [unique]
+  name varchar(255) [not null]
+  road_address varchar(255) [not null]
+  lot_address varchar(255)
+  tel varchar(50)
+  category varchar(100)
+  main_menu varchar(255)
+  description text
+  latitude decimal(10,7)
+  longitude decimal(10,7)
+  designation_date date
+  data_reference_date date
+  view_count int [not null, default: 0]
+  bookmark_count int [not null, default: 0]
+  review_count int [not null, default: 0]
+  average_rating decimal(2,1) [not null, default: 0.0]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted bit [not null, default: 0]
+}
+
+Table place_menu {
+  id bigint [pk, increment]
+  place_id bigint [not null, ref: > excellent_place.id]
+  name varchar(255) [not null]
+  price int
+  is_signature bit [not null, default: 0]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted bit [not null, default: 0]
+}
+
+Table place_image {
+  id bigint [pk, increment]
+  place_id bigint [not null, ref: > excellent_place.id]
+  image_url varchar(500) [not null]
+  image_key varchar(255)
+  sort_order int [not null, default: 0]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted bit [not null, default: 0]
+}
+
+Table users {
+  id bigint [pk, increment]
+  email varchar(255) [unique, not null]
+  nickname varchar(50) [unique, not null]
+  password varchar(255)
+  provider varchar(30) [not null, default: "LOCAL"]
+  provider_id varchar(100)
+  profile_image varchar(500)
+  role varchar(30) [not null, default: "USER"]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted bit [not null, default: 0]
+
+  indexes {
+    (provider, provider_id) [unique]
+  }
+}
+
+Table post {
+  id bigint [pk, increment]
+  user_id bigint [not null, ref: > users.id]
+  title varchar(200) [not null]
+  content text [not null]
+  category varchar(30) [not null, default: "GENERAL"]
+  view_count int [not null, default: 0]
+  like_count int [not null, default: 0]
+  comment_count int [not null, default: 0]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted bit [not null, default: 0]
+}
+
+Table post_comment {
+  id bigint [pk, increment]
+  post_id bigint [not null, ref: > post.id]
+  user_id bigint [not null, ref: > users.id]
+  content text [not null]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted bit [not null, default: 0]
+}
+
+Table post_like {
+  id bigint [pk, increment]
+  post_id bigint [not null, ref: > post.id]
+  user_id bigint [not null, ref: > users.id]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted bit [not null, default: 0]
+
+  indexes {
+    (post_id, user_id) [unique]
+  }
+}
+
+Table post_place {
+  id bigint [pk, increment]
+  post_id bigint [not null, ref: > post.id]
+  place_id bigint [not null, ref: > excellent_place.id]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted bit [not null, default: 0]
+
+  indexes {
+    (post_id, place_id) [unique]
+  }
+}
+
+Table place_bookmark {
+  id bigint [pk, increment]
+  user_id bigint [not null, ref: > users.id]
+  place_id bigint [not null, ref: > excellent_place.id]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted bit [not null, default: 0]
+
+  indexes {
+    (user_id, place_id) [unique]
+  }
+}
+
+Table place_review {
+  id bigint [pk, increment]
+  user_id bigint [not null, ref: > users.id]
+  place_id bigint [not null, ref: > excellent_place.id]
+  content text [not null]
+  rating tinyint [not null]
+  like_count int [not null, default: 0]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted bit [not null, default: 0]
+}
+
+Table place_review_like {
+  id bigint [pk, increment]
+  review_id bigint [not null, ref: > place_review.id]
+  user_id bigint [not null, ref: > users.id]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted bit [not null, default: 0]
+
+  indexes {
+    (review_id, user_id) [unique]
+  }
+}
+
+Table notification {
+  id bigint [pk, increment]
+  user_id bigint [not null, ref: > users.id]
+  type varchar(30) [not null]
+  message varchar(255) [not null]
+  target_type varchar(30)
+  target_id bigint
+  is_read bit [not null, default: 0]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  deleted bit [not null, default: 0]
+}

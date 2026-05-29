@@ -1,12 +1,25 @@
 package com.ssafy.eatBusan.postlike.repository;
 
+import com.ssafy.eatBusan.member.domain.Member;
+import com.ssafy.eatBusan.post.domain.Post;
 import com.ssafy.eatBusan.postlike.domain.PostLike;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
+import java.util.Optional;
 
 public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
 
-    Optional<PostLike> findByPostIdAndMemberId(Long postId, Long memberId);
-    boolean existsByPostIdAndMemberIdAndDeletedFalse(Long postId, Long memberId);
-    Long countByPostIdAndDeletedFalse(Long postId);
+    @Query("SELECT pl FROM PostLike pl WHERE pl.post = :post AND pl.member = :member AND pl.deleted = false")
+    Optional<PostLike> findByPostAndMemberDeletedFalse(Post post, Member member);
+    boolean existsByPostAndMemberAndDeletedFalse(Post post, Member member);
+
+    long countByPostIdAndDeletedFalse(Long postId);
+    @Query("SELECT pl.member.id FROM PostLike pl WHERE pl.post.id = :postId AND pl.deleted=false")
+    List<Long> findMemberIdsByPostId(@Param("postId") Long postId);
+
+    @Query("SELECT pl FROM PostLike pl WHERE pl.post.id = :postId AND  pl.member.id = :memberId")
+    Optional<PostLike> findIncludingDeleted(@Param("postId") Long postId, @Param("memberId") Long memberId);
 }

@@ -25,7 +25,11 @@ public abstract class BaseEntity {
     @Column(columnDefinition = "bit(1) NOT NULL DEFAULT b'0'", nullable = false)
     private boolean deleted;
 
-    public void delete()    {
+    public void delete() {
         this.deleted = true;
+    }
+
+    public void restore() {
+        this.deleted = false;
     }
 }

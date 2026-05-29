@@ -47,9 +47,6 @@ public class Post extends BaseEntity {
     @Builder.Default
     private int viewCount = 0;
 
-    @Column(nullable = false)
-    @Builder.Default
-    private int likeCount = 0;
 
     @Column(nullable = false)
     @Builder.Default
@@ -62,14 +59,6 @@ public class Post extends BaseEntity {
     public void update(String title, String content) {
         this.title = title;
         this.content = content;
-    }
-
-    public void increaseLikeCount() {
-        this.likeCount++;
-    }
-
-    public void decreaseLikeCount() {
-        this.likeCount--;
     }
 
     public void increaseCommentCount() {
