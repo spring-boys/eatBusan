@@ -14,7 +14,7 @@ public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
 
     @Query("SELECT pl FROM PostLike pl WHERE pl.post = :post AND pl.member = :member AND pl.deleted = false")
     Optional<PostLike> findByPostAndMemberDeletedFalse(Post post, Member member);
-    boolean existsByPostAndMemberAndDeletedFalse(Post post, Member member);
+    boolean existsByPostIdAndMemberIdAndDeletedFalse(Long postId, Long memberId);
 
     long countByPostIdAndDeletedFalse(Long postId);
     @Query("SELECT pl.member.id FROM PostLike pl WHERE pl.post.id = :postId AND pl.deleted=false")
