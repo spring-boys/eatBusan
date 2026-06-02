@@ -21,7 +21,7 @@ public abstract class BaseEntity {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    @Column(columnDefinition = "bit(1) NOT NULL DEFAULT b'0'", nullable = false)
+    @Column(columnDefinition = "boolean default false", nullable = false)
     private boolean deleted;
 
     public void delete() {
