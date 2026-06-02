@@ -31,7 +31,7 @@ public class Post extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
-    private Member user;
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "place_id", nullable = false)
@@ -47,9 +47,6 @@ public class Post extends BaseEntity {
     @Builder.Default
     private int viewCount = 0;
 
-    @Column(nullable = false)
-    @Builder.Default
-    private int likeCount = 0;
 
     @Column(nullable = false)
     @Builder.Default
@@ -62,14 +59,6 @@ public class Post extends BaseEntity {
     public void update(String title, String content) {
         this.title = title;
         this.content = content;
-    }
-
-    public void increaseLikeCount() {
-        this.likeCount++;
-    }
-
-    public void decreaseLikeCount() {
-        this.likeCount--;
     }
 
     public void increaseCommentCount() {
