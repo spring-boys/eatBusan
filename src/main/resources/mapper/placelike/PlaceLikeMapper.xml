@@ -10,9 +10,37 @@
     </insert>
 
     <select id="existsByMemberIdAndPlaceId" resultType="boolean">
-        SELECT COUNT(*) > 0 FROM place_like
+        SELECT COUNT(*) > 0
+        FROM place_like
         WHERE member_id = #{memberId} AND place_id = #{placeId}
     </select>
+
+    <delete id="deletePlaceLikeByPlaceIdAndMemberId">
+        DELETE
+        FROM place_like
+        WHERE member_id = #{memberId} AND place_id = #{placeId}
+    </delete>
+
+    <select id="findPlaceLikesByMemberId" resultType="com.ssafy.eatBusan.placelike.dto.PlaceLikeDetailResponseDto">
+        SELECT
+            pl.id AS placeLikeId,
+            p.id AS placeId,
+            p.code,
+            p.name,
+            p.address,
+            p.area_code AS areaCode,
+            p.phone,
+            p.url
+        FROM place_like pl
+        JOIN place p ON pl.place_id = p.id
+        WHERE pl.member_id = #{memberId}
+        <if test="lastId != null">
+            AND pl.id &lt; #{lastId}
+        </if>
+        ORDER BY pl.id DESC
+        LIMIT #{size}
+    </select>
+
 
 
 </mapper>

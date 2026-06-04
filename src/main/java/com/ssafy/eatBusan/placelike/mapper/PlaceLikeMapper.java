@@ -1,6 +1,8 @@
 package com.ssafy.eatBusan.placelike.mapper;
 
+import com.ssafy.eatBusan.placelike.dto.PlaceLikeDetailResponseDto;
 import com.ssafy.eatBusan.placelike.dto.PlaceLikeRequestDto;
+import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -10,5 +12,13 @@ public interface PlaceLikeMapper {
     void insertPlaceLike(PlaceLikeRequestDto dto);
 
     boolean existsByMemberIdAndPlaceId(@Param("memberId") Long memberId, @Param("placeId") Long placeId);
+
+    void deletePlaceLikeByPlaceIdAndMemberId(@Param("memberId") Long memberId, @Param("placeId") Long placeId);
+
+    List<PlaceLikeDetailResponseDto> findPlaceLikesByMemberId(
+            @Param("memberId") Long memberId,
+            @Param("lastId") Long lastId,
+            @Param("size") int size
+    );
 
 }
