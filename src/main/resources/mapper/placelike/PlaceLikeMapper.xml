@@ -4,8 +4,14 @@
 
 <mapper namespace="com.ssafy.eatBusan.placelike.mapper.PlaceLikeMapper">
 
-    <select id="test" resultType="int">
-        SELECT COUNT(*) FROM place_like
+    <insert id="insertPlaceLike" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO place_like (member_id, place_id)
+        VALUES (#{memberId}, #{placeId})
+    </insert>
+
+    <select id="existsByMemberIdAndPlaceId" resultType="boolean">
+        SELECT COUNT(*) > 0 FROM place_like
+        WHERE member_id = #{memberId} AND place_id = #{placeId}
     </select>
 
 
