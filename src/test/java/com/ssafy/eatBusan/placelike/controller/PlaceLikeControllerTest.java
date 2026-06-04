@@ -125,6 +125,7 @@ class PlaceLikeControllerTest {
             softly.assertThat(list.size()).isEqualTo(2);
             softly.assertThat(list.getFirst().name()).isEqualTo(place1.getName()); //오름차순 정렬중
             softly.assertThat(list.getLast().phone()).isEqualTo(place2.getPhone());
+            softly.assertThat(list.getFirst().likeCnt()).isEqualTo(1L);
         });
 
     }

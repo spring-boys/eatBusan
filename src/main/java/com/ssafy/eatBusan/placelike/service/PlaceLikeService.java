@@ -38,6 +38,4 @@ public class PlaceLikeService {
         return placeLikeMapper.findPlaceLikesByMemberId(memberId, lastId, size);
     }
 
-
-
 }

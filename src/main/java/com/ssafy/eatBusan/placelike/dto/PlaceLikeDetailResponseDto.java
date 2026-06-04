@@ -8,6 +8,7 @@ public record PlaceLikeDetailResponseDto(
         String address,
         String areaCode,
         String phone,
-        String url
+        String url,
+        Long likeCnt
 ) {
 }
