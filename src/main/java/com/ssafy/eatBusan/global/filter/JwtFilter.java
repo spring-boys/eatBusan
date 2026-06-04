@@ -27,7 +27,8 @@ public class JwtFilter implements Filter {
             "/api/members/login",
             "/api/members/join",
             "/api/members/refresh",
-            "/api/posts/**"
+            "/api/posts/**",
+            "/api/**" // 개발을 위한 whiteList
     };
 
     private boolean isWhiteListed(String uri){

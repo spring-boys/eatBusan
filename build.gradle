@@ -44,6 +44,9 @@ dependencies {
 	// security 의존성(BCryptPasswordEncoder)
 	implementation 'org.springframework.security:spring-security-crypto'
 
+	// MyBatis
+	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
+
 	testImplementation("com.h2database:h2")
 
 }
