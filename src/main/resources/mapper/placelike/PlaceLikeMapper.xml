@@ -37,7 +37,7 @@
         <if test="lastId != null">
             AND pl.id &lt; #{lastId}
         </if>
-        ORDER BY pl.id DESC
+        ORDER BY pl.id ASC
         LIMIT #{size}
     </select>
 

@@ -5,6 +5,7 @@ import com.ssafy.eatBusan.member.dto.MemberDto;
 import com.ssafy.eatBusan.placelike.dto.PlaceLikeDetailResponseDto;
 import com.ssafy.eatBusan.placelike.dto.PlaceLikeResponseDto;
 import com.ssafy.eatBusan.placelike.service.PlaceLikeService;
+import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,7 @@ public class PlaceLikeController {
             @PathVariable Long placeId
     ) {
         PlaceLikeResponseDto responseDto = placeLikeService.createPlaceLike(memberDto.id(), placeId);
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.created(URI.create(String.format("/api/places/likes/%d", responseDto.id()))).build();
     }
 
     // placeId 기반 좋아요 지우기
