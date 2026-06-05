@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.eatBusan.postcomment.mapper.PostCommentMapper">
+
+  <select id="findByPostId" resultType="PostCommentDto">
+    SELECT id,
+    content,
+    created_at
+    FROM post_comment
+    WHERE post_id = #{postId} AND deleted=false
+    <if test="cursor != null">
+      AND id &lt; #{cursor}
+    </if>
+    ORDER BY id DESC
+    LIMIT #{size}
+  </select>
+
+
+  <update id="updateComment">
+    UPDATE post_comment
+    SET content = #{content},
+        updated_at = NOW()
+    WHERE id = #{commentId}
+      AND post_id = #{postId}
+      AND member_id = #{memberId}
+      AND deleted = false
+  </update>
+
+  <insert id="saveComment">
+    INSERT INTO post_comment
+      (member_id, post_id, content, created_at, updated_at)
+    VALUES (#{memberId}, #{postId}, #{content}, NOW(), NOW())
+  </insert>
+
+  <update id="deleteComment">
+    UPDATE post_comment
+    SET deleted    = true,
+        updated_at = NOW()
+    WHERE id = #{commentId}
+      AND post_id = #{postId}
+      AND member_id = #{memberId}
+      AND deleted = false
+  </update>
+
+  <update id="restoreComment">
+    UPDATE post_comment
+    SET deleted    = false,
+        updated_at = NOW()
+    WHERE id = #{commentId}
+      AND post_id = #{postId}
+      AND member_id = #{memberId}
+      AND deleted = true
+  </update>
+
+  <update id="increaseCommentCount">
+   UPDATE post
+   SET comment_count = comment_count + 1, updated_at = NOW()
+   WHERE id = #{postId}
+   AND deleted = false
+  </update>
+
+  <update id="decreaseCommentCount">
+    UPDATE post
+    SET comment_count = GREATEST(comment_count - 1, 0),
+        updated_at    = NOW()
+    WHERE id = #{postId}
+      AND deleted = false
+  </update>
+</mapper>
