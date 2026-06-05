@@ -26,7 +26,7 @@ public class PlaceLikeController {
 
     // 좋아요 누르기
     @PostMapping("/places/{placeId}/likes")
-    public ResponseEntity<PlaceLikeResponseDto> likePlace(
+    public ResponseEntity<Void> likePlace(
             @LoginMember MemberDto memberDto,
             @PathVariable Long placeId
     ) {
