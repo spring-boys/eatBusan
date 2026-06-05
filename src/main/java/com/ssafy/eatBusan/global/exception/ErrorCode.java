@@ -8,28 +8,31 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum ErrorCode {
 
-    // Member
+    //Member
     MEMBER_DUPLICATE(HttpStatus.CONFLICT, "이미 등록된 회원입니다"),
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "없는 회원입니다."),
 
-    // auth
+    //auth
     AUTH_INVALID_LOGIN(HttpStatus.UNAUTHORIZED, "ID/PW가 틀렸습니다."),
 
-    // jwt
+    //jwt
     TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "토큰이 없습니다."),
     RTOKEN_COOKIE_NOT_FOUND(HttpStatus.UNAUTHORIZED, "Refresh 토큰이 없습니다."),
     TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
     RTOKEN_INVALID(HttpStatus.UNAUTHORIZED, "유효하지 않은 Refresh 토큰입니다."),
 
-    // refreshToken
+    //refreshToken
     RTOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "Refresh 토큰을 찾을 수 없습니다."),
     RTOKEN_MISMATCH(HttpStatus.UNAUTHORIZED, "Refresh 토큰이 일치하지 않습니다."),
 
-    // post
-    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "없는 후기입니다"),
+    //post
+    POST_NOT_FOUND(HttpStatus.NOT_FOUND,"없는 후기입니다"),
 
-    // place
+    //place
     PLACE_NOT_FOUND(HttpStatus.NOT_FOUND, "없는 식당입니다."),
+
+    //plcaeLike
+    PLACE_LIKE_DUPLICATE(HttpStatus.BAD_REQUEST, "이미 좋아요한 장소입니다."),
 
     // redis
     REDIS_BOOTSTRAP_TIMEOUT(HttpStatus.SERVICE_UNAVAILABLE, "좋아요 캐시 초기화 중입니다. 잠시 후 다시 시도해주세요."),
