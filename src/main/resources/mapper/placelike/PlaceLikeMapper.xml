@@ -23,17 +23,21 @@
 
     <select id="findPlaceLikesByMemberId" resultType="com.ssafy.eatBusan.placelike.dto.PlaceLikeDetailResponseDto">
         SELECT
-        pl.id AS placeLikeId,
-        p.id AS placeId,
-        p.code,
-        p.name,
-        p.address,
-        p.area_code AS areaCode,
-        p.phone,
-        p.url,
-        (SELECT COUNT(*) FROM place_like WHERE place_id = p.id) AS likeCnt
+            pl.id AS placeLikeId,
+            p.id AS placeId,
+            p.code,
+            p.name,
+            p.address,
+            p.area_code AS areaCode,
+            p.phone, p.url,
+            COALESCE(lc.cnt, 0) AS likeCnt
         FROM place_like pl
         JOIN place p ON pl.place_id = p.id
+        LEFT JOIN (
+        SELECT place_id, COUNT(*) AS cnt
+        FROM place_like
+        GROUP BY place_id
+        ) lc ON lc.place_id = p.id
         WHERE pl.member_id = #{memberId}
         <if test="lastId != null">
         AND pl.id &gt; #{lastId}
