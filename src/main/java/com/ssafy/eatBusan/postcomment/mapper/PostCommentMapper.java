@@ -28,4 +28,7 @@ public interface PostCommentMapper {
     List<PostCommentDto> findByPostId(@Param("postId") Long postId,
         @Param("cursor") Long cursor,
         @Param("size") int size);
+
+    int increaseCommentCount(@Param("postId") Long postId);
+    int decreaseCommentCount(@Param("postId") Long postId);
 }

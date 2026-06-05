@@ -3,7 +3,9 @@ package com.ssafy.eatBusan.postcomment.controller;
 import com.ssafy.eatBusan.auth.resolver.LoginMember;
 import com.ssafy.eatBusan.member.dto.MemberDto;
 import com.ssafy.eatBusan.postcomment.dto.PostCommentPageResponse;
+import com.ssafy.eatBusan.postcomment.dto.PostCommentRequestDto;
 import com.ssafy.eatBusan.postcomment.service.PostCommentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,8 +36,9 @@ public class PostCommentController {
 
     @PostMapping("/{postId}/comments")
     public ResponseEntity<Void> postComments(@PathVariable Long postId,
-        @RequestParam String content, @LoginMember MemberDto member) {
-        postCommentService.save(postId, content, member.id());
+        @RequestBody @Valid PostCommentRequestDto requestDto,
+        @LoginMember MemberDto member) {
+        postCommentService.save(postId, requestDto.content(), member.id());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -48,8 +52,10 @@ public class PostCommentController {
 
     @PatchMapping("/{postId}/comments/{commentId}")
     public ResponseEntity<Void> updateComment(@PathVariable Long postId,
-        @PathVariable Long commentId, @RequestParam String content, @LoginMember MemberDto member) {
-        postCommentService.update(postId, commentId, content, member.id());
+        @PathVariable Long commentId,
+        @RequestBody @Valid PostCommentRequestDto requestDto,
+        @LoginMember MemberDto member) {
+        postCommentService.update(postId, commentId, requestDto.content(), member.id());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

@@ -53,4 +53,19 @@
       AND member_id = #{memberId}
       AND deleted = true
   </update>
+
+  <update id="increaseCommentCount">
+   UPDATE post
+   SET comment_count = comment_count + 1, updated_at = NOW()
+   WHERE id = #{postId}
+   AND deleted = false
+  </update>
+
+  <update id="decreaseCommentCount">
+    UPDATE post
+    SET comment_count = GREATEST(comment_count - 1, 0),
+        updated_at    = NOW()
+    WHERE id = #{postId}
+      AND deleted = false
+  </update>
 </mapper>

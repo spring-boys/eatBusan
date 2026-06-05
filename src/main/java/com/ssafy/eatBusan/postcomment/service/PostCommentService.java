@@ -24,31 +24,26 @@ public class PostCommentService {
 
     @Transactional
     public void save(Long postId, String content, Long memberId) {
-        Post post = getPost(postId);
-        validateMember(memberId);
+        getPost(postId);
         validateContent(content);
 
         postCommentMapper.saveComment(memberId, postId, content);
-        post.increaseCommentCount();
+        postCommentMapper.increaseCommentCount(postId);
     }
 
     @Transactional
     public void delete(Long postId, Long commentId, Long memberId) {
-        Post post = getPost(postId);
-        validateMember(memberId);
-
         int deleted = postCommentMapper.deleteComment(postId, memberId, commentId);
         if (deleted == 0) {
             throw new EBException(ErrorCode.COMMENT_NOT_FOUND);
         }
 
-        post.decreaseCommentCount();
+        postCommentMapper.decreaseCommentCount(postId);
     }
 
     @Transactional
     public void update(Long postId, Long commentId, String content, Long memberId) {
         getPost(postId);
-        validateMember(memberId);
         validateContent(content);
 
         int updated = postCommentMapper.updateComment(postId, memberId, commentId, content);
@@ -87,6 +82,8 @@ public class PostCommentService {
             .orElseThrow(() -> new EBException(ErrorCode.POST_NOT_FOUND));
     }
 
+    // TODO: JWT로 이미 검증된 멤버 재검증 메서드 삭제 여부 결정할 것
+    @SuppressWarnings("unused")
     private void validateMember(Long memberId) {
         if (memberRepository.findById(memberId).isEmpty()) {
             throw new EBException(ErrorCode.MEMBER_NOT_FOUND);
