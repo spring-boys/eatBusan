@@ -19,13 +19,12 @@ public class KakaoApiUtil {
 
     private final PlaceService placeService;
 
-    private final String uri = "/v2/local/search/keyword.json";
+    private final String uri = "/v2/local/search/category.json";
 
     public void searchPlaces(PlaceRequestDto placeRequestDto) {
         ResponseEntity<KakaoSearchResponse> response = kakaoClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(uri)
-                        .queryParam("query", "음식점") // 필수 값
                         .queryParam("category_group_code", "FD6")
                         .queryParam("radius", placeRequestDto.radius())
                         .queryParam("x", placeRequestDto.x())
