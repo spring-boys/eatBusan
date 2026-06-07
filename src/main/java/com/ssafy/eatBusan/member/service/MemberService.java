@@ -10,6 +10,7 @@ import com.ssafy.eatBusan.global.exception.ErrorCode;
 import com.ssafy.eatBusan.member.domain.Member;
 import com.ssafy.eatBusan.member.dto.LoginRequestDto;
 import com.ssafy.eatBusan.member.dto.MemberDto;
+import com.ssafy.eatBusan.member.dto.MemberInfoDto;
 import com.ssafy.eatBusan.member.dto.MemberRequestDto;
 import com.ssafy.eatBusan.member.dto.MemberResponseDto;
 import com.ssafy.eatBusan.member.repository.MemberRepository;
@@ -94,6 +95,12 @@ public class MemberService {
         //쿠키에 refreshToken을,,,
         cookieUtil.saveRefreshToken(refreshToken, response);
         refreshTokenService.saveRefreshToken(member, refreshToken);
+    }
+
+    public MemberInfoDto findMemberInfo(MemberDto memberDto) {
+        Member member = memberRepository.findById(memberDto.id())
+                .orElseThrow(() -> new EBException(ErrorCode.MEMBER_NOT_FOUND));
+        return MemberInfoDto.from(member);
     }
 
 
