@@ -60,10 +60,18 @@ public class PlaceService {
     }
 
     // 랜덤으로 부산 지역의 음식점을 가져오기
-    public List<PlaceResponseDto> getRandomPlaces() {
-        return placeRepository.getRandomPlaces(PageRequest.of(0, 20))
-                .stream()
-                .map(PlaceResponseDto::from)
+    public List<PlaceResponseListDto> getRandomPlaces() {
+        List<Place> randomPlaceList = placeRepository.getRandomPlaces(PageRequest.of(0, 20));
+
+        List<Long> placeIds = randomPlaceList.stream().map(Place::getId).toList();
+        Map<Long, Long> likeCnt = getPlacesLikeCnt(placeIds);
+        Map<Long, Long> postCnt = getPostCnt(placeIds);
+
+        return randomPlaceList.stream()
+                .map(place -> PlaceResponseListDto.from(
+                        place,
+                        postCnt.getOrDefault(place.getId(), 0L),
+                        likeCnt.getOrDefault(place.getId(), 0L)))
                 .toList();
     }
 

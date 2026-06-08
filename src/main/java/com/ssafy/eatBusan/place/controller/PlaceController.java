@@ -42,8 +42,8 @@ public class PlaceController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PlaceResponseDto>> getRandomPlaces(){
-        List<PlaceResponseDto> placeResponseList = placeService.getRandomPlaces();
+    public ResponseEntity<List<PlaceResponseListDto>> getRandomPlaces(){
+        List<PlaceResponseListDto> placeResponseList = placeService.getRandomPlaces();
         return ResponseEntity.ok(placeResponseList);
     }
 

@@ -7,8 +7,6 @@ public record PlaceResponseListDto(
         String address,
         String area_cde,
         String name,
-        String phone,
-        String url,
         Long postCnt,
         Long likeCnt
 ) {
@@ -19,8 +17,6 @@ public record PlaceResponseListDto(
                 place.getAddress(),
                 place.getAreaCode(),
                 place.getName(),
-                place.getPhone(),
-                place.getUrl(),
                 postCnt,
                 likeCnt
         );
