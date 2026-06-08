@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,8 +25,6 @@ public class PlaceController {
 
     private final PlaceService placeService;
 
-    private final KakaoApiUtil kakaoApiUtil;
-
     @GetMapping("/area/{areaCode}")
     public ResponseEntity<Page<PlaceResponseListDto>> searchPlaceByAreaCode(
             @PathVariable String areaCode,
@@ -35,10 +34,11 @@ public class PlaceController {
         return ResponseEntity.ok(placeService.findPlaceByAreaCode(areaCode, PageRequest.of(page, size)));
     }
 
-    @GetMapping("/search")
-    public void searchPlace(@RequestBody(required = false) PlaceRequestDto placeRequestDto) {
-        placeRequestDto = new PlaceRequestDto(129.0516, 35.1631, 1000);// mock
-        kakaoApiUtil.searchPlaces(placeRequestDto); //결과를 list에 넣어서 반환
+    @PostMapping("/search")
+    public ResponseEntity<List<PlaceResponseListDto>> searchPlace(@RequestBody(required = false) PlaceRequestDto placeRequestDto) {
+        System.out.println(placeRequestDto);
+        List<PlaceResponseListDto> placeList = placeService.searchPlace(placeRequestDto);
+        return ResponseEntity.ok(placeList);
     }
 
     @GetMapping

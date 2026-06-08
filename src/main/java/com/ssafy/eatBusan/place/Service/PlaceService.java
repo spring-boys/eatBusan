@@ -3,8 +3,11 @@ package com.ssafy.eatBusan.place.Service;
 import com.ssafy.eatBusan.global.exception.EBException;
 import com.ssafy.eatBusan.global.exception.ErrorCode;
 import com.ssafy.eatBusan.place.Repository.PlaceRepository;
+import com.ssafy.eatBusan.place.apiUtil.KakaoApiUtil;
+import com.ssafy.eatBusan.place.apiUtil.dto.KakaoPlaceResponse;
 import com.ssafy.eatBusan.place.apiUtil.dto.KakaoSearchResponse;
 import com.ssafy.eatBusan.place.domain.Place;
+import com.ssafy.eatBusan.place.dto.PlaceRequestDto;
 import com.ssafy.eatBusan.place.dto.PlaceResponseDto;
 import com.ssafy.eatBusan.place.dto.PlaceResponseListDto;
 import com.ssafy.eatBusan.placelike.dto.PlaceLikeCntDto;
@@ -31,6 +34,7 @@ public class PlaceService {
     private final PlaceRepository placeRepository;
     private final PlaceLikeMapper placeLikeMapper;
     private final PostRepository postRepository;
+    private final KakaoApiUtil kakaoApiUtil;
 
     private final PlaceAddressUtil placeAddressUtil;
 
@@ -55,6 +59,17 @@ public class PlaceService {
 
     }
 
+    // 랜덤으로 부산 지역의 음식점을 가져오기
+    @Transactional
+    public List<PlaceResponseListDto> searchPlace(PlaceRequestDto placeRequestDto) {
+        KakaoSearchResponse placeResponses = kakaoApiUtil.searchPlaces(placeRequestDto);
+        saveNewPlace(placeResponses);
+
+        List<String> placesCode = placeResponses.documents().stream().map(KakaoPlaceResponse::code).toList();
+        List<Place> placeList = placeRepository.findPlacesByCodeList(placesCode);
+        return toPlaceResponseListDtos(placeList);
+    }
+
     //음식점 상세 조회
     public PlaceResponseDto getPlaceDetail(Long placeId) {
         Place place = placeRepository.findPlaceById(placeId)
@@ -65,19 +80,21 @@ public class PlaceService {
     // 랜덤으로 부산 지역의 음식점을 가져오기
     public List<PlaceResponseListDto> getRandomPlaces() {
         List<Place> randomPlaceList = placeRepository.getRandomPlaces(PageRequest.of(0, 20));
+        return toPlaceResponseListDtos(randomPlaceList);
+    }
 
-        List<Long> placeIds = randomPlaceList.stream().map(Place::getId).toList();
+    private List<PlaceResponseListDto> toPlaceResponseListDtos(List<Place> placeList) {
+        List<Long> placeIds = placeList.stream().map(Place::getId).toList();
         Map<Long, Long> likeCnt = getPlacesLikeCnt(placeIds);
         Map<Long, Long> postCnt = getPostCnt(placeIds);
 
-        return randomPlaceList.stream()
+        return placeList.stream()
                 .map(place -> PlaceResponseListDto.from(
                         place,
                         postCnt.getOrDefault(place.getId(), 0L),
                         likeCnt.getOrDefault(place.getId(), 0L)))
                 .toList();
     }
-
 
     private Map<Long, Long> getPlacesLikeCnt(List<Long> placeIds) {
         Map<Long, Long> placeLikeMap = new HashMap<>();
@@ -97,9 +114,7 @@ public class PlaceService {
         return postMap;
     }
 
-
-    @Transactional
-    public void saveNewPlace(KakaoSearchResponse kakaoSearchResponse) {
+    private void saveNewPlace(KakaoSearchResponse kakaoSearchResponse) {
         List<String> placeList = kakaoSearchResponse.documents().stream()
                 .map(kakaoPlaceResponse -> kakaoPlaceResponse.code())
                 .toList();
@@ -127,6 +142,5 @@ public class PlaceService {
 
         placeRepository.saveAll(newPlaceList);
     }
-
 
 }

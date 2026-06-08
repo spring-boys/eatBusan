@@ -3,6 +3,7 @@ package com.ssafy.eatBusan.place.apiUtil;
 import com.ssafy.eatBusan.place.Service.PlaceService;
 import com.ssafy.eatBusan.place.apiUtil.dto.KakaoSearchResponse;
 import com.ssafy.eatBusan.place.dto.PlaceRequestDto;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -17,11 +18,9 @@ public class KakaoApiUtil {
 
     private final RestClient kakaoClient;
 
-    private final PlaceService placeService;
-
     private final String uri = "/v2/local/search/category.json";
 
-    public void searchPlaces(PlaceRequestDto placeRequestDto) {
+    public KakaoSearchResponse searchPlaces(PlaceRequestDto placeRequestDto) {
         ResponseEntity<KakaoSearchResponse> response = kakaoClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(uri)
@@ -34,9 +33,7 @@ public class KakaoApiUtil {
                 .accept(MediaType.ALL).retrieve()
                 .toEntity(KakaoSearchResponse.class);
 
-        placeService.saveNewPlace(response.getBody());
-
-        System.out.println(response);
+        return response.getBody();
     }
 
 
