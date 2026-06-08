@@ -6,7 +6,14 @@ import com.ssafy.eatBusan.place.Repository.PlaceRepository;
 import com.ssafy.eatBusan.place.apiUtil.dto.KakaoSearchResponse;
 import com.ssafy.eatBusan.place.domain.Place;
 import com.ssafy.eatBusan.place.dto.PlaceResponseDto;
+import com.ssafy.eatBusan.place.dto.PlaceResponseListDto;
+import com.ssafy.eatBusan.placelike.dto.PlaceLikeCntDto;
+import com.ssafy.eatBusan.placelike.mapper.PlaceLikeMapper;
+import com.ssafy.eatBusan.post.dto.PostCntDto;
+import com.ssafy.eatBusan.post.repository.PostRepository;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -22,31 +29,63 @@ import org.springframework.transaction.annotation.Transactional;
 public class PlaceService {
 
     private final PlaceRepository placeRepository;
+    private final PlaceLikeMapper placeLikeMapper;
+    private final PostRepository postRepository;
 
     private final PlaceAddressUtil placeAddressUtil;
 
-    //TODO: 음식점 정보 (단순)저장
+    //TODO: 음식점 조회(좋아요 수, post 개수 포함)
+    public Page<PlaceResponseListDto> findPlaceByAreaCode(String areaCode, Pageable pageable) {
 
-    //TODO: 음식점 조회
-    public Page<PlaceResponseDto> findPlaceByAreaCode(String areaCode, Pageable pageable){
-        return placeRepository.findPlaceByAreaCode(areaCode, pageable)
-                .map(PlaceResponseDto::from);
+        Page<Place> placePage = placeRepository.findPlaceByAreaCode(areaCode, pageable);
+
+        List<Long> placeIds = placePage.map(Place::getId).toList();
+        Map<Long, Long> likeCnt = getPlacesLikeCnt(placeIds);
+        Map<Long, Long> postCnt = getPostCnt(placeIds);
+
+        return placePage.map(
+                place -> PlaceResponseListDto.from(
+                        place,
+                        postCnt.getOrDefault(place.getId(), 0L),
+                        likeCnt.getOrDefault(place.getId(), 0L))
+        );
+
     }
 
     //음식점 상세 조회
-    public PlaceResponseDto getPlaceDetail(Long placeId){
+    public PlaceResponseDto getPlaceDetail(Long placeId) {
         Place place = placeRepository.findPlaceById(placeId)
                 .orElseThrow(() -> new EBException(ErrorCode.PLACE_NOT_FOUND));
         return PlaceResponseDto.from(place);
     }
 
     // 랜덤으로 부산 지역의 음식점을 가져오기
-    public List<PlaceResponseDto> getRandomPlaces(){
+    public List<PlaceResponseDto> getRandomPlaces() {
         return placeRepository.getRandomPlaces(PageRequest.of(0, 20))
                 .stream()
                 .map(PlaceResponseDto::from)
                 .toList();
     }
+
+
+    private Map<Long, Long> getPlacesLikeCnt(List<Long> placeIds) {
+        Map<Long, Long> placeLikeMap = new HashMap<>();
+        List<PlaceLikeCntDto> placeLikeCntDtoList = placeLikeMapper.countPlaceLikesByPlaceIds(placeIds);
+        for (PlaceLikeCntDto cntDto : placeLikeCntDtoList) {
+            placeLikeMap.put(cntDto.placeId(), cntDto.cnt());
+        }
+        return placeLikeMap;
+    }
+
+    private Map<Long, Long> getPostCnt(List<Long> placeIds) {
+        Map<Long, Long> postMap = new HashMap<>();
+        List<PostCntDto> postCntDtos = postRepository.countPostByIds(placeIds);
+        for (PostCntDto cntDto : postCntDtos) {
+            postMap.put(cntDto.placeId(), cntDto.cnt());
+        }
+        return postMap;
+    }
+
 
     @Transactional
     public void saveNewPlace(KakaoSearchResponse kakaoSearchResponse) {

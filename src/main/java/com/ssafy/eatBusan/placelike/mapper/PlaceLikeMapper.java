@@ -1,5 +1,6 @@
 package com.ssafy.eatBusan.placelike.mapper;
 
+import com.ssafy.eatBusan.placelike.dto.PlaceLikeCntDto;
 import com.ssafy.eatBusan.placelike.dto.PlaceLikeDetailResponseDto;
 import com.ssafy.eatBusan.placelike.dto.PlaceLikeRequestDto;
 import java.util.List;
@@ -20,5 +21,7 @@ public interface PlaceLikeMapper {
             @Param("lastId") Long lastId,
             @Param("size") int size
     );
+
+    List<PlaceLikeCntDto> countPlaceLikesByPlaceIds(@Param("placeIds") List<Long> placeIds);
 
 }

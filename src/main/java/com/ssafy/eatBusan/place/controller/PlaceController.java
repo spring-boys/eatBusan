@@ -4,6 +4,7 @@ import com.ssafy.eatBusan.place.Service.PlaceService;
 import com.ssafy.eatBusan.place.apiUtil.KakaoApiUtil;
 import com.ssafy.eatBusan.place.dto.PlaceRequestDto;
 import com.ssafy.eatBusan.place.dto.PlaceResponseDto;
+import com.ssafy.eatBusan.place.dto.PlaceResponseListDto;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,8 +26,8 @@ public class PlaceController {
 
     private final KakaoApiUtil kakaoApiUtil;
 
-    @GetMapping("/{areaCode}")
-    public ResponseEntity<Page<PlaceResponseDto>> searchPlaceByAreaCode(
+    @GetMapping("/area/{areaCode}")
+    public ResponseEntity<Page<PlaceResponseListDto>> searchPlaceByAreaCode(
             @PathVariable String areaCode,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "0") int page

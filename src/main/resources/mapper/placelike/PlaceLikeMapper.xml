@@ -46,6 +46,18 @@
         LIMIT #{size}
     </select>
 
+    <select id="countPlaceLikesByPlaceIds" resultType="com.ssafy.eatBusan.placelike.dto.PlaceLikeCntDto">
+        select
+            place_id as placeId,
+            count(*) as cnt
+        from place_like
+        where place_id in
+        <foreach collection="placeIds" item="placeId" open="(" separator="," close=")">
+            #{placeId}
+        </foreach>
+        group by place_id
+    </select>
+
 
 
 </mapper>
