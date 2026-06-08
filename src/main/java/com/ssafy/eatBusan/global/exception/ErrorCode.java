@@ -29,6 +29,7 @@ public enum ErrorCode {
 
     // place
     PLACE_NOT_FOUND(HttpStatus.NOT_FOUND, "없는 식당입니다."),
+    PLACE_AREA_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 지역에서 식당을 찾을 수 없습니다."),
 
     // plcaeLike
     PLACE_LIKE_DUPLICATE(HttpStatus.BAD_REQUEST, "이미 좋아요한 장소입니다."),

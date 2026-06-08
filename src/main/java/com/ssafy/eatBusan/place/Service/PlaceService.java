@@ -40,6 +40,9 @@ public class PlaceService {
         Page<Place> placePage = placeRepository.findPlaceByAreaCode(areaCode, pageable);
 
         List<Long> placeIds = placePage.map(Place::getId).toList();
+
+        if(placeIds.isEmpty()) return placePage.map(place -> PlaceResponseListDto.from(place, 0L, 0L));
+
         Map<Long, Long> likeCnt = getPlacesLikeCnt(placeIds);
         Map<Long, Long> postCnt = getPostCnt(placeIds);
 
