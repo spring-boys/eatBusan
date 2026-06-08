@@ -4,6 +4,7 @@ import com.ssafy.eatBusan.place.Service.PlaceService;
 import com.ssafy.eatBusan.place.apiUtil.KakaoApiUtil;
 import com.ssafy.eatBusan.place.dto.PlaceRequestDto;
 import com.ssafy.eatBusan.place.dto.PlaceResponseDto;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,6 +38,18 @@ public class PlaceController {
     public void searchPlace(@RequestBody(required = false) PlaceRequestDto placeRequestDto) {
         placeRequestDto = new PlaceRequestDto(129.0833, 35.2319, 1000);// mock
         kakaoApiUtil.searchPlaces(placeRequestDto); //결과를 list에 넣어서 반환
+    }
+
+    @GetMapping
+    public ResponseEntity<List<PlaceResponseDto>> getRandomPlaces(){
+        List<PlaceResponseDto> placeResponseList = placeService.getRandomPlaces();
+        return ResponseEntity.ok(placeResponseList);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PlaceResponseDto> getPlaceDetail(@PathVariable Long id){
+        PlaceResponseDto placeResponseDto = placeService.getPlaceDetail(id);
+        return ResponseEntity.ok(placeResponseDto);
     }
 
 }

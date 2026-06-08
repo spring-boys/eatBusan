@@ -1,5 +1,7 @@
 package com.ssafy.eatBusan.place.Service;
 
+import com.ssafy.eatBusan.global.exception.EBException;
+import com.ssafy.eatBusan.global.exception.ErrorCode;
 import com.ssafy.eatBusan.place.Repository.PlaceRepository;
 import com.ssafy.eatBusan.place.apiUtil.dto.KakaoSearchResponse;
 import com.ssafy.eatBusan.place.domain.Place;
@@ -8,6 +10,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +33,20 @@ public class PlaceService {
                 .map(PlaceResponseDto::from);
     }
 
-    //TODO: 음식점 이름으로 조회
+    //음식점 상세 조회
+    public PlaceResponseDto getPlaceDetail(Long placeId){
+        Place place = placeRepository.findPlaceById(placeId)
+                .orElseThrow(() -> new EBException(ErrorCode.PLACE_NOT_FOUND));
+        return PlaceResponseDto.from(place);
+    }
+
+    // 랜덤으로 부산 지역의 음식점을 가져오기
+    public List<PlaceResponseDto> getRandomPlaces(){
+        return placeRepository.getRandomPlaces(PageRequest.of(0, 20))
+                .stream()
+                .map(PlaceResponseDto::from)
+                .toList();
+    }
 
     @Transactional
     public void saveNewPlace(KakaoSearchResponse kakaoSearchResponse) {
