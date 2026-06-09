@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.eatBusan.postimage.mapper.PostImageMapper">
+
+  <select id="findByPostId" resultType="PostImageDto">
+    SELECT id,
+           post_id,
+           image_url,
+           image_key,
+           sort_order
+    FROM post_image
+    WHERE post_id = #{postId}
+    AND deleted = false
+    ORDER BY sort_order ASC
+  </select>
+
+  <insert id="saveImage">
+    INSERT INTO post_image
+    (post_id, image_url, image_key, sort_order, created_at, updated_at, deleted)
+    VALUES (#{postId}, #{imageUrl}, #{imageKey}, #{sortOrder}, NOW(), NOW(), false)
+  </insert>
+
+
+</mapper>
