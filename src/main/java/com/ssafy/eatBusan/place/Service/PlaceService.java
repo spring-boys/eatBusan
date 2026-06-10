@@ -130,7 +130,7 @@ public class PlaceService {
                 .map(response -> Place.builder()
                         .code(response.code())
                         .name(response.name())
-                        .areaCode(placeAddressUtil.toAreaCode(response.address().split(" ")[1]))
+                        .areaCode(placeAddressUtil.toAreaCode(response.address()))
                         .address(response.address())
                         .phone(response.phone())
                         .url(response.url())
@@ -142,5 +142,6 @@ public class PlaceService {
 
         placeRepository.saveAll(newPlaceList);
     }
+
 
 }

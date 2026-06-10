@@ -36,7 +36,7 @@ public class PlaceController {
 
     @PostMapping("/search")
     public ResponseEntity<List<PlaceResponseListDto>> searchPlace(@RequestBody(required = false) PlaceRequestDto placeRequestDto) {
-        System.out.println(placeRequestDto);
+        if(placeRequestDto == null) placeRequestDto = new PlaceRequestDto(129.0838,35.2322, 1000);
         List<PlaceResponseListDto> placeList = placeService.searchPlace(placeRequestDto);
         return ResponseEntity.ok(placeList);
     }
