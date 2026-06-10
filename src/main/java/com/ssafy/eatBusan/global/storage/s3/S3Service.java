@@ -1,5 +1,7 @@
 package com.ssafy.eatBusan.global.storage.s3;
 
+import com.ssafy.eatBusan.global.exception.EBException;
+import com.ssafy.eatBusan.global.exception.ErrorCode;
 import com.ssafy.eatBusan.global.storage.s3.dto.S3UploadResult;
 import java.io.IOException;
 import java.util.UUID;
@@ -40,7 +42,7 @@ public class S3Service {
                 RequestBody.fromInputStream(file.getInputStream(), file.getSize())
             );
         } catch (IOException e) {
-            throw new IllegalStateException("S3 이미지 업로드에 실패했습니다.", e);
+            throw new EBException(ErrorCode.IMAGE_UPLOAD_FAILURE);
         }
 
         return new S3UploadResult(createImageUrl(imageKey), imageKey);
@@ -48,12 +50,12 @@ public class S3Service {
 
     private void validateImageFile(MultipartFile file) {
         if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("이미지 파일이 비어 있습니다.");
+            throw new EBException(ErrorCode.EMPTY_IMAGE_FILE);
         }
 
         String contentType = file.getContentType();
         if (contentType == null || !contentType.startsWith("image/")) {
-            throw new IllegalArgumentException("이미지 파일만 업로드할 수 있습니다.");
+            throw new EBException(ErrorCode.NOT_IMAGE_FILE);
         }
     }
 
