@@ -5,7 +5,7 @@ import com.ssafy.eatBusan.place.domain.Place;
 public record PlaceResponseDto(
         Long id,
         String address,
-        String area_cde,
+        String area_code,
         String name,
         String phone,
         String url

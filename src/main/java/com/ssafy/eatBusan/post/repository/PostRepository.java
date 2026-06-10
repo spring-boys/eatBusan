@@ -13,9 +13,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Optional<Post> findByIdAndDeletedFalse(Long id);
 
     @Query("""
-                select new com.ssafy.eatBusan.post.dto.PostCntDto(p.place.id,count(p))
+                select new com.ssafy.eatBusan.post.dto.PostCntDto(p.place.id, count(p))
                 from Post p
                 where p.place.id in :placeIds
+                and p.deleted = false 
                 group by p.place.id
             """)
     List<PostCntDto> countPostByIds(List<Long> placeIds);
