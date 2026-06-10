@@ -1,8 +1,10 @@
 package com.ssafy.eatBusan.place.Service;
 
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class PlaceAddressUtil {
 
@@ -15,8 +17,10 @@ public class PlaceAddressUtil {
             Map.entry("기장군","26710")
     );
 
-    public String toAreaCode(String gugun){
-        System.out.println(gugun);
+    public String toAreaCode(String address){
+        if(address == null || address.isBlank()) return "기타";
+        String gugun = address.split(" ")[1];
+        log.info("gugun = {}", gugun);
         return areaMap.getOrDefault(gugun, "기타");
     }
 

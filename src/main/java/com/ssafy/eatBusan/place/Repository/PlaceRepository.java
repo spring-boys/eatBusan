@@ -2,6 +2,7 @@ package com.ssafy.eatBusan.place.Repository;
 
 import com.ssafy.eatBusan.place.domain.Place;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,4 +16,8 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
     @Query("select p from Place p where p.code in :codes")
     List<Place> findPlacesByCodeList(List<String> codes);
 
+    @Query("select p from Place p order by function('RAND')")
+    List<Place> getRandomPlaces(Pageable pageable);
+
+    Optional<Place> findPlaceById(Long id);
 }
