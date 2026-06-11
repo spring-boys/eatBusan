@@ -1,5 +1,7 @@
 package com.ssafy.eatBusan.post.service;
 
+import com.ssafy.eatBusan.auth.domain.TokenType;
+import com.ssafy.eatBusan.auth.util.JWTUtil;
 import com.ssafy.eatBusan.global.exception.EBException;
 import com.ssafy.eatBusan.global.exception.ErrorCode;
 import com.ssafy.eatBusan.member.domain.Member;
@@ -30,16 +32,19 @@ public class PostService {
     private final PostLikeCacheService postLikeCacheService;
     private final PostImageMapper postImageMapper;
     private final PostImageService postImageService;
+    private final JWTUtil jwtUtil;
 
-    public List<PostResponseDto> getAllPost() {
+    public List<PostResponseDto> getAllPost(String authorization) {
+        Long memberId = resolveMemberId(authorization);
         return postRepository.findAllByDeletedFalse().stream()
-                .map(this::toResponse)
+                .map(post -> toResponse(post, memberId))
                 .toList();
     }
 
-    public List<PostResponseDto> getPostsByPlace(Long placeId) {
+    public List<PostResponseDto> getPostsByPlace(Long placeId, String authorization) {
+        Long memberId = resolveMemberId(authorization);
         return postRepository.findAllByPlace_IdAndDeletedFalseOrderByIdDesc(placeId).stream()
-                .map(this::toResponse)
+                .map(post -> toResponse(post, memberId))
                 .toList();
     }
 
@@ -58,18 +63,18 @@ public class PostService {
     }
 
     @Transactional
-    public PostResponseDto updatePost(PostRequireDto req, Long postId) {
+    public PostResponseDto updatePost(PostRequireDto req, Long postId, String authorization) {
         Post post = postRepository.findByIdAndDeletedFalse(postId).orElseThrow(() -> new EBException(ErrorCode.MEMBER_NOT_FOUND));
         post.update(req.title(), req.content());
-        return toResponse(post);
+        return toResponse(post, resolveMemberId(authorization));
     }
 
     @Transactional
-    public PostResponseDto getPost(Long id) {
+    public PostResponseDto getPost(Long id, String authorization) {
         // TODO: MEMBER NOT FOUND -> POST NOT FOUND로 변경
         Post post = postRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> new EBException(ErrorCode.MEMBER_NOT_FOUND));
         post.increaseViewCount();
-        return toResponse(post);
+        return toResponse(post, resolveMemberId(authorization));
     }
 
     @Transactional
@@ -93,8 +98,25 @@ public class PostService {
     }
 
     private PostResponseDto toResponse(Post post) {
+        return toResponse(post, null);
+    }
+
+    private PostResponseDto toResponse(Post post, Long memberId) {
         List<PostImageDto> images = postImageMapper.findByPostId(post.getId());
-        return PostResponseDto.from(post, postLikeCacheService.likeCount(post.getId()), images);
+        boolean liked = memberId != null && postLikeCacheService.checkLiked(post.getId(), memberId);
+        return PostResponseDto.from(post, postLikeCacheService.likeCount(post.getId()), images, liked);
+    }
+
+    // 조회는 비로그인도 허용(화이트리스트)이라 @LoginMember 필수형을 못 쓴다.
+    // Authorization 헤더가 유효할 때만 memberId 를 뽑아 liked 판별에 쓴다 (auth 패키지는 호출만, 수정 없음).
+    private Long resolveMemberId(String authorization) {
+        if (authorization == null || authorization.isBlank()) {
+            return null;
+        }
+        if (!jwtUtil.validateToken(authorization, TokenType.ACCESS)) {
+            return null;
+        }
+        return jwtUtil.getId(authorization, TokenType.ACCESS);
     }
 
     private List<PostImageDto> uploadImagesIfPresent(Long postId, List<MultipartFile> files) {
