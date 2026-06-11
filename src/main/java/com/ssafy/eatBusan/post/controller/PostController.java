@@ -5,6 +5,7 @@ import com.ssafy.eatBusan.post.dto.PostResponseDto;
 import com.ssafy.eatBusan.post.service.PostService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +14,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -32,9 +35,17 @@ public class PostController {
         return ResponseEntity.ok(postService.getPost(postId));
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PostResponseDto> createPost(@RequestBody PostRequireDto req) {
         return ResponseEntity.ok(postService.writePost(req));
+    }
+
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<PostResponseDto> createPostWithImages(
+            @RequestPart("post") PostRequireDto req,
+            @RequestPart(value = "files", required = false) List<MultipartFile> files
+    ) {
+        return ResponseEntity.ok(postService.writePostWithImages(req, files));
     }
 
     @PatchMapping("/{postId}")
