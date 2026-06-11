@@ -80,7 +80,7 @@ class PostServiceTests {
         PostResponseDto second = createPost("secondTitle", "secondContent");
         postService.deletePost(first.postId());
 
-        List<PostResponseDto> posts = postService.getAllPost();
+        List<PostResponseDto> posts = postService.getAllPost(null);
 
         assertThat(posts)
                 .extracting(PostResponseDto::postId)
@@ -91,8 +91,8 @@ class PostServiceTests {
     void getPost_상세조회시_조회수가_증가한다() {
         PostResponseDto created = createPost("testTitle", "testContent");
 
-        PostResponseDto firstRead = postService.getPost(created.postId());
-        PostResponseDto secondRead = postService.getPost(created.postId());
+        PostResponseDto firstRead = postService.getPost(created.postId(), null);
+        PostResponseDto secondRead = postService.getPost(created.postId(), null);
 
         assertThat(firstRead.viewCount()).isEqualTo(1);
         assertThat(secondRead.viewCount()).isEqualTo(2);
@@ -103,7 +103,7 @@ class PostServiceTests {
         PostResponseDto created = createPost("oldTitle", "oldContent");
         PostRequireDto updateReq = createRequest("newTitle", "newContent");
 
-        PostResponseDto updated = postService.updatePost(updateReq, created.postId());
+        PostResponseDto updated = postService.updatePost(updateReq, created.postId(), null);
 
         assertThat(updated.postId()).isEqualTo(created.postId());
         assertThat(updated.placeId()).isEqualTo(place.getId());
@@ -128,7 +128,7 @@ class PostServiceTests {
                 .get()
                 .extracting(Post::isDeleted)
                 .isEqualTo(true);
-        assertThatThrownBy(() -> postService.getPost(created.postId()))
+        assertThatThrownBy(() -> postService.getPost(created.postId(), null))
                 .isInstanceOf(EBException.class);
     }
 
