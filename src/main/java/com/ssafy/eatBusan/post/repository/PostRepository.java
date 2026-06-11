@@ -12,6 +12,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     Optional<Post> findByIdAndDeletedFalse(Long id);
 
+    List<Post> findAllByPlace_IdAndDeletedFalseOrderByIdDesc(Long placeId);
+
     @Query("""
                 select new com.ssafy.eatBusan.post.dto.PostCntDto(p.place.id, count(p))
                 from Post p

@@ -37,6 +37,12 @@ public class PostService {
                 .toList();
     }
 
+    public List<PostResponseDto> getPostsByPlace(Long placeId) {
+        return postRepository.findAllByPlace_IdAndDeletedFalseOrderByIdDesc(placeId).stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
 
     @Transactional
     public PostResponseDto writePost(PostRequireDto req) {
