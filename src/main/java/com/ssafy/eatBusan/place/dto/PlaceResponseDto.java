@@ -8,17 +8,21 @@ public record PlaceResponseDto(
         String area_code,
         String name,
         String phone,
-        String url
+        String url,
+        Long likeCnt,
+        boolean myLike
 ) {
 
-    public static PlaceResponseDto from(Place place){
+    public static PlaceResponseDto from(Place place, Long likeCnt, boolean myLike){
         return new PlaceResponseDto(
                 place.getId(),
                 place.getAddress(),
                 place.getAreaCode(),
                 place.getName(),
                 place.getPhone(),
-                place.getUrl()
+                place.getUrl(),
+                likeCnt,
+                myLike
         );
     }
 

@@ -1,5 +1,7 @@
 package com.ssafy.eatBusan.place.controller;
 
+import com.ssafy.eatBusan.auth.resolver.LoginMember;
+import com.ssafy.eatBusan.member.dto.MemberDto;
 import com.ssafy.eatBusan.place.Service.PlaceService;
 import com.ssafy.eatBusan.place.apiUtil.KakaoApiUtil;
 import com.ssafy.eatBusan.place.dto.PlaceRequestDto;
@@ -48,8 +50,12 @@ public class PlaceController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PlaceResponseDto> getPlaceDetail(@PathVariable Long id){
-        PlaceResponseDto placeResponseDto = placeService.getPlaceDetail(id);
+    public ResponseEntity<PlaceResponseDto> getPlaceDetail(
+            @PathVariable Long id,
+            @LoginMember MemberDto memberDto
+    ){
+        Long memberId = memberDto == null ? null : memberDto.id();
+        PlaceResponseDto placeResponseDto = placeService.getPlaceDetail(id, memberId);
         return ResponseEntity.ok(placeResponseDto);
     }
 
