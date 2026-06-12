@@ -1,7 +1,6 @@
 package com.ssafy.eatBusan.member.controller;
 
 import com.ssafy.eatBusan.auth.resolver.LoginMember;
-import com.ssafy.eatBusan.auth.service.RefreshTokenService;
 import com.ssafy.eatBusan.member.dto.LoginRequestDto;
 import com.ssafy.eatBusan.member.dto.MemberDto;
 import com.ssafy.eatBusan.member.dto.MemberInfoDto;

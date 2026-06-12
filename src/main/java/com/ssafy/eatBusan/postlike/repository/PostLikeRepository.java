@@ -3,12 +3,11 @@ package com.ssafy.eatBusan.postlike.repository;
 import com.ssafy.eatBusan.member.domain.Member;
 import com.ssafy.eatBusan.post.domain.Post;
 import com.ssafy.eatBusan.postlike.domain.PostLike;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
-import java.util.List;
-import java.util.Optional;
 
 public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
 
