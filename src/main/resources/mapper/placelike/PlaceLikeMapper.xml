@@ -58,6 +58,10 @@
         group by place_id
     </select>
 
-
+    <select id="countPlaceLikesByPlaceId" resultType="long">
+        SELECT COUNT(*)
+        FROM place_like
+        WHERE place_id = #{placeId}
+    </select>
 
 </mapper>

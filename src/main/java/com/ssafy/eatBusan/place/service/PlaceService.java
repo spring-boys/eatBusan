@@ -1,4 +1,4 @@
-package com.ssafy.eatBusan.place.Service;
+package com.ssafy.eatBusan.place.service;
 
 import com.ssafy.eatBusan.global.exception.EBException;
 import com.ssafy.eatBusan.global.exception.ErrorCode;
@@ -71,10 +71,15 @@ public class PlaceService {
     }
 
     //음식점 상세 조회
-    public PlaceResponseDto getPlaceDetail(Long placeId) {
+    public PlaceResponseDto getPlaceDetail(Long placeId, Long memberId) {
         Place place = placeRepository.findPlaceById(placeId)
                 .orElseThrow(() -> new EBException(ErrorCode.PLACE_NOT_FOUND));
-        return PlaceResponseDto.from(place);
+
+        Long placeLikeCnt = placeLikeMapper.countPlaceLikesByPlaceId(placeId);
+
+        boolean myLike = memberId == null ? false : placeLikeMapper.existsByMemberIdAndPlaceId(memberId, placeId);
+
+        return PlaceResponseDto.from(place, placeLikeCnt, myLike);
     }
 
     // 랜덤으로 부산 지역의 음식점을 가져오기

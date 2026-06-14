@@ -24,4 +24,6 @@ public interface PlaceLikeMapper {
 
     List<PlaceLikeCntDto> countPlaceLikesByPlaceIds(@Param("placeIds") List<Long> placeIds);
 
+    Long countPlaceLikesByPlaceId(@Param("placeId") Long placeId);
+
 }

@@ -1,9 +1,7 @@
 package com.ssafy.eatBusan.place.apiUtil;
 
-import com.ssafy.eatBusan.place.Service.PlaceService;
 import com.ssafy.eatBusan.place.apiUtil.dto.KakaoSearchResponse;
 import com.ssafy.eatBusan.place.dto.PlaceRequestDto;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
