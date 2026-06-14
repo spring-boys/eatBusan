@@ -2,7 +2,7 @@ package com.ssafy.eatBusan.place.controller;
 
 import com.ssafy.eatBusan.auth.resolver.LoginMember;
 import com.ssafy.eatBusan.member.dto.MemberDto;
-import com.ssafy.eatBusan.place.Service.PlaceService;
+import com.ssafy.eatBusan.place.service.PlaceService;
 import com.ssafy.eatBusan.place.dto.PlaceRequestDto;
 import com.ssafy.eatBusan.place.dto.PlaceResponseDto;
 import com.ssafy.eatBusan.place.dto.PlaceResponseListDto;

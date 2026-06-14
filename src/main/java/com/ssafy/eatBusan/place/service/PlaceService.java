@@ -1,4 +1,4 @@
-package com.ssafy.eatBusan.place.Service;
+package com.ssafy.eatBusan.place.service;
 
 import com.ssafy.eatBusan.global.exception.EBException;
 import com.ssafy.eatBusan.global.exception.ErrorCode;
