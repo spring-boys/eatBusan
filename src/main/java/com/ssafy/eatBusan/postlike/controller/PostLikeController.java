@@ -2,11 +2,14 @@ package com.ssafy.eatBusan.postlike.controller;
 
 import com.ssafy.eatBusan.auth.resolver.LoginMember;
 import com.ssafy.eatBusan.member.dto.MemberDto;
+import com.ssafy.eatBusan.post.dto.MyLikedPostDto;
 import com.ssafy.eatBusan.postlike.dto.PostLikeResponse;
 import com.ssafy.eatBusan.postlike.service.PostLikeService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,5 +30,10 @@ public class PostLikeController {
         PostLikeResponse postLikeResponse = postLikeService.like(postId, loginMember.id());
         // 토글의 경우 200으로 일괄 처리하되, ResponseDTO를 통해 현재 상태를 넘겨줌
         return ResponseEntity.status(HttpStatus.OK).body(postLikeResponse);
+    }
+
+    @GetMapping("/likes/my")
+    public ResponseEntity<List<MyLikedPostDto>> getMyLikedPost(@LoginMember MemberDto memberDto) {
+        return ResponseEntity.ok(postLikeService.getPostByMyLiked(memberDto.id()));
     }
 }

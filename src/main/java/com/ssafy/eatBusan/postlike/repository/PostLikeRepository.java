@@ -13,12 +13,18 @@ public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
 
     @Query("SELECT pl FROM PostLike pl WHERE pl.post = :post AND pl.member = :member AND pl.deleted = false")
     Optional<PostLike> findByPostAndMemberDeletedFalse(Post post, Member member);
+
     boolean existsByPostIdAndMemberIdAndDeletedFalse(Long postId, Long memberId);
 
     long countByPostIdAndDeletedFalse(Long postId);
+
     @Query("SELECT pl.member.id FROM PostLike pl WHERE pl.post.id = :postId AND pl.deleted=false")
     List<Long> findMemberIdsByPostId(@Param("postId") Long postId);
 
     @Query("SELECT pl FROM PostLike pl WHERE pl.post.id = :postId AND  pl.member.id = :memberId")
-    Optional<PostLike> findIncludingDeleted(@Param("postId") Long postId, @Param("memberId") Long memberId);
+    Optional<PostLike> findIncludingDeleted(@Param("postId") Long postId,
+        @Param("memberId") Long memberId);
+
+    @Query("SELECT pl.post FROM PostLike pl WHERE pl.member.id = :memberId AND pl.post.deleted = false AND pl.deleted = false ORDER BY pl.id DESC")
+    List<Post> findLikedPostsByMemberId(@Param("memberId") Long memberId);
 }

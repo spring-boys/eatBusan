@@ -5,10 +5,12 @@ import com.ssafy.eatBusan.global.exception.ErrorCode;
 import com.ssafy.eatBusan.member.domain.Member;
 import com.ssafy.eatBusan.member.repository.MemberRepository;
 import com.ssafy.eatBusan.post.domain.Post;
+import com.ssafy.eatBusan.post.dto.MyLikedPostDto;
 import com.ssafy.eatBusan.post.repository.PostRepository;
 import com.ssafy.eatBusan.postlike.domain.PostLike;
 import com.ssafy.eatBusan.postlike.dto.PostLikeResponse;
 import com.ssafy.eatBusan.postlike.repository.PostLikeRepository;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -117,5 +119,11 @@ public class PostLikeService {
 
     public boolean isLiked(Long postId, Long memberId) {
         return postLikeCacheService.checkLiked(postId, memberId);
+    }
+
+    public List<MyLikedPostDto> getPostByMyLiked(Long memberId) {
+        return postLikeRepository.findLikedPostsByMemberId(memberId).stream()
+            .map(MyLikedPostDto::from)
+            .toList();
     }
 }
