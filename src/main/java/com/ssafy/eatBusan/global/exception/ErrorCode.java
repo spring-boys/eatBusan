@@ -43,8 +43,7 @@ public enum ErrorCode {
         "페이지 사이즈는 0보다 커야 합니다."),
 
     // S3
-    IMAGE_UPLOAD_FAILURE(HttpStatus.INTERNAL_SERVER_ERROR,
-        "S3 이미지 업로드에 실패했습니다."),
+    IMAGE_UPLOAD_FAILURE(HttpStatus.INTERNAL_SERVER_ERROR, "S3 이미지 업로드에 실패했습니다."),
     NOT_IMAGE_FILE(HttpStatus.BAD_REQUEST, "이미지 파일만 업로드할 수 있습니다."),
     EMPTY_IMAGE_FILE(HttpStatus.BAD_REQUEST, "빈 이미지 파일입니다."),
     POST_IMAGE_NOT_FOUND(

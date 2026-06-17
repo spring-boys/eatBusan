@@ -27,10 +27,16 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
             NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
 
         //MemberDto에 사용자 정보 집어 넣기
         String token = request.getHeader("Authorization");
+
+        if(token == null || token.isBlank()){
+            return null;
+        }
+
         Long id = jwtUtil.getId(token, TokenType.ACCESS);
         return new MemberDto(id);
     }

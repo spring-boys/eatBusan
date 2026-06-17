@@ -9,9 +9,7 @@ import com.ssafy.eatBusan.post.repository.PostRepository;
 import com.ssafy.eatBusan.postlike.domain.PostLike;
 import com.ssafy.eatBusan.postlike.dto.PostLikeResponse;
 import com.ssafy.eatBusan.postlike.repository.PostLikeRepository;
-
 import java.util.Optional;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.RedisConnectionFailureException;

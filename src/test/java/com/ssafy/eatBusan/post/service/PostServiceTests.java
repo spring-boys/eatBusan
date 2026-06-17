@@ -1,5 +1,8 @@
 package com.ssafy.eatBusan.post.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import com.ssafy.eatBusan.global.exception.EBException;
 import com.ssafy.eatBusan.member.domain.Member;
 import com.ssafy.eatBusan.member.repository.MemberRepository;
@@ -9,16 +12,12 @@ import com.ssafy.eatBusan.post.domain.Post;
 import com.ssafy.eatBusan.post.dto.PostRequireDto;
 import com.ssafy.eatBusan.post.dto.PostResponseDto;
 import com.ssafy.eatBusan.post.repository.PostRepository;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @Transactional
