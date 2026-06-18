@@ -16,6 +16,21 @@
     ORDER BY sort_order ASC
   </select>
 
+  <select id="findByPostIds" resultType="PostImageDto">
+    SELECT id,
+           post_id,
+           image_url,
+           image_key,
+           sort_order
+    FROM post_image
+    WHERE deleted = false
+    AND post_id IN
+    <foreach item="id" collection="postIds" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+    ORDER BY post_id, sort_order ASC
+  </select>
+
   <insert id="saveImage">
     INSERT INTO post_image
     (post_id, image_url, image_key, sort_order, created_at, updated_at, deleted)

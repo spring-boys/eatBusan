@@ -7,11 +7,15 @@ import com.ssafy.eatBusan.member.repository.MemberRepository;
 import com.ssafy.eatBusan.post.domain.Post;
 import com.ssafy.eatBusan.post.dto.MyLikedPostDto;
 import com.ssafy.eatBusan.post.repository.PostRepository;
+import com.ssafy.eatBusan.postimage.dto.PostImageDto;
+import com.ssafy.eatBusan.postimage.mapper.PostImageMapper;
 import com.ssafy.eatBusan.postlike.domain.PostLike;
 import com.ssafy.eatBusan.postlike.dto.PostLikeResponse;
 import com.ssafy.eatBusan.postlike.repository.PostLikeRepository;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.RedisConnectionFailureException;
@@ -28,6 +32,7 @@ public class PostLikeService {
     private final PostLikeRepository postLikeRepository;
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
+    private final PostImageMapper postImageMapper;
 
     @Transactional
     public PostLikeResponse like(Long postId, Long memberId) {
@@ -122,8 +127,18 @@ public class PostLikeService {
     }
 
     public List<MyLikedPostDto> getPostByMyLiked(Long memberId) {
-        return postLikeRepository.findLikedPostsByMemberId(memberId).stream()
-            .map(MyLikedPostDto::from)
+        // 작성자는 JOIN FETCH 로 함께 로드된다(N+1 없음).
+        List<Post> posts = postLikeRepository.findLikedPostsByMemberId(memberId);
+        if (posts.isEmpty()) {
+            return List.of();
+        }
+        // 대표 썸네일은 IN 쿼리 한 번으로 모아 N+1 을 피한다.
+        // sort_order 오름차순이라 postId 별 첫 행이 대표 이미지다.
+        List<Long> postIds = posts.stream().map(Post::getId).toList();
+        Map<Long, String> thumbnails = postImageMapper.findByPostIds(postIds).stream()
+            .collect(Collectors.toMap(PostImageDto::postId, PostImageDto::imageUrl, (first, second) -> first));
+        return posts.stream()
+            .map(post -> MyLikedPostDto.from(post, thumbnails.get(post.getId())))
             .toList();
     }
 }
