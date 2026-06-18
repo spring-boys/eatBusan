@@ -17,6 +17,18 @@
     LIMIT #{size}
   </select>
 
+  <select id="findByMemberId" resultType="MyCommentDto">
+   SELECT pc.id,
+          pc.post_id,
+          p.title AS post_title,
+          pc.content,
+          pc.created_at
+   FROM post_comment pc
+   JOIN post p ON p.id = pc.post_id
+   WHERE pc.deleted = false AND p.deleted = false AND pc.member_id = #{memberId}
+   ORDER BY pc.id DESC
+  </select>
+
 
   <update id="updateComment">
     UPDATE post_comment
