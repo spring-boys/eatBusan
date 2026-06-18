@@ -38,7 +38,7 @@ public class PostImageController {
     }
 
     @DeleteMapping("/{postId}/images/{imageId}")
-    public ResponseEntity<?> deleteImage(
+    public ResponseEntity<Void> deleteImage(
         @PathVariable Long postId,
         @PathVariable Long imageId,
         @LoginMember MemberDto memberDto
