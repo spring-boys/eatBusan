@@ -26,6 +26,8 @@ public enum ErrorCode {
 
     // post
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "없는 후기입니다"),
+    POST_FORBIDDEN(HttpStatus.FORBIDDEN,
+        "본인의 후기만 수정/삭제할 수 있습니다."),
 
     // place
     PLACE_NOT_FOUND(HttpStatus.NOT_FOUND, "없는 식당입니다."),

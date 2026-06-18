@@ -4,6 +4,8 @@ import com.ssafy.eatBusan.global.exception.EBException;
 import com.ssafy.eatBusan.global.exception.ErrorCode;
 import com.ssafy.eatBusan.global.storage.s3.S3Service;
 import com.ssafy.eatBusan.global.storage.s3.dto.S3UploadResult;
+import com.ssafy.eatBusan.member.dto.MemberDto;
+import com.ssafy.eatBusan.post.domain.Post;
 import com.ssafy.eatBusan.post.repository.PostRepository;
 import com.ssafy.eatBusan.postimage.dto.PostImageDto;
 import com.ssafy.eatBusan.postimage.dto.S3DeleteEvent;
@@ -31,8 +33,8 @@ public class PostImageService {
         return postImageMapper.findByPostId(postId);
     }
 
-    private void validatePost(Long postId) {
-        postRepository.findByIdAndDeletedFalse(postId)
+    private Post validatePost(Long postId) {
+        return postRepository.findByIdAndDeletedFalse(postId)
             .orElseThrow(() -> new EBException(ErrorCode.POST_NOT_FOUND));
     }
 
@@ -50,8 +52,11 @@ public class PostImageService {
 
 
     @Transactional
-    public void deleteImage(Long postId, Long imageId) {
-        validatePost(postId);
+    public void deleteImage(Long postId, Long imageId, MemberDto memberDto) {
+        Post post = validatePost(postId);
+        if(!post.getMember().getId().equals(memberDto.id())){
+           throw new EBException(ErrorCode.POST_FORBIDDEN);
+        }
         PostImageDto image = postImageMapper.findByPostIdAndImageId(postId,
             imageId);
 

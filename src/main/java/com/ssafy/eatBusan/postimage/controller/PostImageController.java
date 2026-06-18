@@ -1,5 +1,7 @@
 package com.ssafy.eatBusan.postimage.controller;
 
+import com.ssafy.eatBusan.auth.resolver.LoginMember;
+import com.ssafy.eatBusan.member.dto.MemberDto;
 import com.ssafy.eatBusan.postimage.dto.PostImageDto;
 import com.ssafy.eatBusan.postimage.service.PostImageService;
 import java.util.List;
@@ -38,9 +40,10 @@ public class PostImageController {
     @DeleteMapping("/{postId}/images/{imageId}")
     public ResponseEntity<?> deleteImage(
         @PathVariable Long postId,
-        @PathVariable Long imageId
+        @PathVariable Long imageId,
+        @LoginMember MemberDto memberDto
     ) {
-        postImageService.deleteImage(postId, imageId);
+        postImageService.deleteImage(postId, imageId, memberDto);
         return ResponseEntity.noContent().build();
     }
 }
