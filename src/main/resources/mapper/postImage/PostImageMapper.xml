@@ -37,7 +37,7 @@
 
   <update id="deleteImage">
     UPDATE post_image
-    SET deleted = true
+    SET deleted = true, updated_at = NOW()
     WHERE id = #{imageId}
       AND deleted = false
   </update>
