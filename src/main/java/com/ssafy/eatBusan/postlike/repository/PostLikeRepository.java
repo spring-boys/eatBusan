@@ -6,6 +6,7 @@ import com.ssafy.eatBusan.postlike.domain.PostLike;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -21,4 +22,13 @@ public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
 
     @Query("SELECT pl FROM PostLike pl WHERE pl.post.id = :postId AND  pl.member.id = :memberId")
     Optional<PostLike> findIncludingDeleted(@Param("postId") Long postId, @Param("memberId") Long memberId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("delete from PostLike pl where pl.member.id =:memberId")
+    void deleteByMemberId(Long memberId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("delete from PostLike pl where pl.post.id in :postIds")
+    void deleteByPostIds(@Param("postIds") List<Long> postIds);
+
 }

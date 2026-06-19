@@ -68,4 +68,18 @@
     WHERE id = #{postId}
       AND deleted = false
   </update>
+
+  <delete id="deletePostCommentByMemberId">
+    DELETE FROM post_comment
+    WHERE member_id = #{memberId}
+  </delete>
+
+  <delete id="deletePostCommentByPostIds">
+    DELETE FROM post_comment
+    WHERE post_id IN
+    <foreach collection="postIds" item="postId" open="(" separator="," close=")">
+      #{postId}
+    </foreach>
+  </delete>
+
 </mapper>

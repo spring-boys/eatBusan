@@ -31,4 +31,7 @@ public interface PostCommentMapper {
 
     int increaseCommentCount(@Param("postId") Long postId);
     int decreaseCommentCount(@Param("postId") Long postId);
+
+    int deletePostCommentByMemberId(@Param("memberId") Long memberId);
+    int deletePostCommentByPostIds(@Param("postIds") List<Long> postIds);
 }

@@ -7,6 +7,7 @@ import com.ssafy.eatBusan.auth.util.CookieUtil;
 import com.ssafy.eatBusan.auth.util.JWTUtil;
 import com.ssafy.eatBusan.global.exception.EBException;
 import com.ssafy.eatBusan.global.exception.ErrorCode;
+import com.ssafy.eatBusan.global.storage.s3.S3Service;
 import com.ssafy.eatBusan.member.domain.Member;
 import com.ssafy.eatBusan.member.dto.LoginRequestDto;
 import com.ssafy.eatBusan.member.dto.MemberDto;
@@ -14,8 +15,14 @@ import com.ssafy.eatBusan.member.dto.MemberInfoDto;
 import com.ssafy.eatBusan.member.dto.MemberRequestDto;
 import com.ssafy.eatBusan.member.dto.MemberResponseDto;
 import com.ssafy.eatBusan.member.repository.MemberRepository;
+import com.ssafy.eatBusan.post.repository.PostRepository;
+import com.ssafy.eatBusan.postcomment.mapper.PostCommentMapper;
+import com.ssafy.eatBusan.postimage.mapper.PostImageMapper;
+import com.ssafy.eatBusan.postimage.service.PostImageService;
+import com.ssafy.eatBusan.postlike.repository.PostLikeRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -31,6 +38,11 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final MemberRepository memberRepository;
     private final RefreshTokenService refreshTokenService;
+    private final PostRepository postRepository;
+    private final PostLikeRepository postLikeRepository;
+    private final PostCommentMapper postCommentMapper;
+    private final PostImageMapper postImageMapper;
+    private final S3Service s3Service;
 
     @Transactional
     public MemberResponseDto join(MemberRequestDto memberRequestDto){
@@ -103,5 +115,32 @@ public class MemberService {
         return MemberInfoDto.from(member);
     }
 
+    @Transactional
+    public void deleteRelatedEntity(MemberDto memberDto){
+
+        Long memberId = memberDto.id();
+
+        // TODO: vote 관련 도메인 지우기
+
+        // postLike 지우기
+        postLikeRepository.deleteByMemberId(memberId);
+        // postComment 지우기
+        postCommentMapper.deletePostCommentByMemberId(memberId);
+
+        // 본인이 작성한 post와 연관된 post들
+        List<Long> postIds = postRepository.findPostsByMemberId(memberId);
+
+        if(!postIds.isEmpty()){
+            postLikeRepository.deleteByPostIds(postIds);
+            postCommentMapper.deletePostCommentByPostIds(postIds);
+            postImageMapper.deleteByPostIds(postIds);
+        }
+
+        // post 지우기
+        postRepository.deleteByMemberId(memberId);
+
+        //TODO: s3에서 이미지 직접 지우기
+
+    }
 
 }
