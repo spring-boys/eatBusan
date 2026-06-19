@@ -139,6 +139,12 @@ public class MemberService {
         // post 지우기
         postRepository.deleteByMemberId(memberId);
 
+        // RefreshToken 지우기
+        refreshTokenService.deleteRefreshTokenByMemberId(memberId);
+
+        //member 지우기
+        memberRepository.deleteByMemberId(memberId);
+
         //TODO: s3에서 이미지 직접 지우기
 
     }
