@@ -26,4 +26,6 @@ public interface PlaceLikeMapper {
 
     Long countPlaceLikesByPlaceId(@Param("placeId") Long placeId);
 
+    void deletePlaceLikesByMemberId(@Param("memberId") Long memberId);
+
 }

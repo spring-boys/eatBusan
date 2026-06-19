@@ -15,6 +15,8 @@ import com.ssafy.eatBusan.member.dto.MemberInfoDto;
 import com.ssafy.eatBusan.member.dto.MemberRequestDto;
 import com.ssafy.eatBusan.member.dto.MemberResponseDto;
 import com.ssafy.eatBusan.member.repository.MemberRepository;
+import com.ssafy.eatBusan.placelike.mapper.PlaceLikeMapper;
+import com.ssafy.eatBusan.placelike.tempdomain.PlaceLike;
 import com.ssafy.eatBusan.post.repository.PostRepository;
 import com.ssafy.eatBusan.postcomment.mapper.PostCommentMapper;
 import com.ssafy.eatBusan.postimage.mapper.PostImageMapper;
@@ -42,6 +44,7 @@ public class MemberService {
     private final PostLikeRepository postLikeRepository;
     private final PostCommentMapper postCommentMapper;
     private final PostImageMapper postImageMapper;
+    private final PlaceLikeMapper placeLikeMapper;
     private final S3Service s3Service;
 
     @Transactional
@@ -138,6 +141,9 @@ public class MemberService {
 
         // post 지우기
         postRepository.deleteByMemberId(memberId);
+
+        //placeLike 지우기
+        placeLikeMapper.deletePlaceLikesByMemberId(memberId);
 
         // RefreshToken 지우기
         refreshTokenService.deleteRefreshTokenByMemberId(memberId);
