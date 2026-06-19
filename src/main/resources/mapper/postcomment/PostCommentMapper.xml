@@ -5,15 +5,17 @@
 <mapper namespace="com.ssafy.eatBusan.postcomment.mapper.PostCommentMapper">
 
   <select id="findByPostId" resultType="PostCommentDto">
-    SELECT id,
-    content,
-    created_at
-    FROM post_comment
-    WHERE post_id = #{postId} AND deleted=false
+    SELECT pc.id,
+    pc.content,
+    pc.created_at,
+    m.email
+    FROM post_comment pc
+    JOIN member m ON m.id = pc.member_id
+    WHERE pc.post_id = #{postId} AND pc.deleted = false
     <if test="cursor != null">
-      AND id &lt; #{cursor}
+      AND pc.id &lt; #{cursor}
     </if>
-    ORDER BY id DESC
+    ORDER BY pc.id DESC
     LIMIT #{size}
   </select>
 
