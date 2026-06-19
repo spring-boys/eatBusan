@@ -5,6 +5,7 @@ import com.ssafy.eatBusan.auth.util.JWTUtil;
 import com.ssafy.eatBusan.global.exception.EBException;
 import com.ssafy.eatBusan.global.exception.ErrorCode;
 import com.ssafy.eatBusan.member.domain.Member;
+import com.ssafy.eatBusan.member.dto.MemberDto;
 import com.ssafy.eatBusan.member.repository.MemberRepository;
 import com.ssafy.eatBusan.place.Repository.PlaceRepository;
 import com.ssafy.eatBusan.place.domain.Place;
@@ -37,6 +38,13 @@ public class PostService {
     public List<PostResponseDto> getAllPost(String authorization) {
         Long memberId = resolveMemberId(authorization);
         return postRepository.findAllByDeletedFalse().stream()
+                .map(post -> toResponse(post, memberId))
+                .toList();
+    }
+
+    public List<PostResponseDto> getMyPost(MemberDto memberDto) {
+        Long memberId = memberDto.id();
+        return postRepository.findAllByMemberIdAndDeletedFalseOrderByIdDesc(memberId).stream()
                 .map(post -> toResponse(post, memberId))
                 .toList();
     }
