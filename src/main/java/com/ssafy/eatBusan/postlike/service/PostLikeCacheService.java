@@ -122,9 +122,7 @@ public class PostLikeCacheService {
                 new Object[0]
             );
             if (!Long.valueOf(1L).equals(invalidated)) {
-                throw new IllegalStateException(
-                    "Post-like cache bootstrap is in progress. postId=" + postId
-                );
+                throw new EBException(ErrorCode.CACHE_BOOTSTRAP_IN_PROGRESS);
             }
         }
     }

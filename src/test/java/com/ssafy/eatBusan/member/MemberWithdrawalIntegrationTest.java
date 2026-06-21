@@ -27,7 +27,9 @@ import com.ssafy.eatBusan.postcomment.service.PostCommentService;
 import com.ssafy.eatBusan.postimage.mapper.PostImageMapper;
 import com.ssafy.eatBusan.postlike.domain.PostLike;
 import com.ssafy.eatBusan.postlike.repository.PostLikeRepository;
+import java.util.ArrayList;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +41,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @SpringBootTest(properties = {
     "member.withdrawal.cache-cleanup.initial-delay-ms=3600000",
@@ -60,9 +63,14 @@ class MemberWithdrawalIntegrationTest {
     @Autowired RefreshTokenRepository refreshTokenRepository;
     @Autowired MemberWithdrawalCacheCleanupTaskRepository cacheCleanupTaskRepository;
     @Autowired JdbcTemplate jdbcTemplate;
+    @Autowired TransactionTemplate transactionTemplate;
     @Autowired DefaultRedisScript<Long> postLikeInvalidateScript;
 
     @MockitoBean StringRedisTemplate redisTemplate;
+
+    private final List<Long> testMemberIds = new ArrayList<>();
+    private final List<Long> testPlaceIds = new ArrayList<>();
+    private final List<Long> testPostIds = new ArrayList<>();
 
     @BeforeEach
     void setUpRedis() {
@@ -71,6 +79,35 @@ class MemberWithdrawalIntegrationTest {
             any(),
             any(Object[].class)
         )).thenReturn(1L);
+    }
+
+    @AfterEach
+    void cleanUpTestData() {
+        transactionTemplate.executeWithoutResult(status -> {
+            testPostIds.forEach(postId -> {
+                jdbcTemplate.update("DELETE FROM post_like WHERE post_id = ?", postId);
+                jdbcTemplate.update("DELETE FROM post_comment WHERE post_id = ?", postId);
+                jdbcTemplate.update("DELETE FROM post_image WHERE post_id = ?", postId);
+            });
+
+            testMemberIds.forEach(memberId -> {
+                jdbcTemplate.update("DELETE FROM post_like WHERE member_id = ?", memberId);
+                jdbcTemplate.update("DELETE FROM post_comment WHERE member_id = ?", memberId);
+                jdbcTemplate.update("DELETE FROM place_like WHERE member_id = ?", memberId);
+                jdbcTemplate.update("DELETE FROM refresh_token WHERE member_id = ?", memberId);
+                jdbcTemplate.update(
+                    "DELETE FROM member_withdrawal_cache_cleanup WHERE member_id = ?",
+                    memberId
+                );
+            });
+
+            testPostIds.forEach(postId ->
+                jdbcTemplate.update("DELETE FROM post WHERE id = ?", postId));
+            testMemberIds.forEach(memberId ->
+                jdbcTemplate.update("DELETE FROM member WHERE id = ?", memberId));
+            testPlaceIds.forEach(placeId ->
+                jdbcTemplate.update("DELETE FROM place WHERE id = ?", placeId));
+        });
     }
 
     @Test
@@ -166,14 +203,16 @@ class MemberWithdrawalIntegrationTest {
     }
 
     private Member saveMember(String email) {
-        return memberRepository.saveAndFlush(Member.builder()
+        Member member = memberRepository.saveAndFlush(Member.builder()
             .email(email)
             .pw("encoded-password")
             .build());
+        testMemberIds.add(member.getId());
+        return member;
     }
 
     private Place savePlace() {
-        return placeRepository.saveAndFlush(Place.builder()
+        Place place = placeRepository.saveAndFlush(Place.builder()
             .code("withdraw-integration-place")
             .name("place")
             .address("address")
@@ -183,15 +222,19 @@ class MemberWithdrawalIntegrationTest {
             .x(1)
             .y(1)
             .build());
+        testPlaceIds.add(place.getId());
+        return place;
     }
 
     private Post savePost(Member member, Place place, String title) {
-        return postRepository.saveAndFlush(Post.builder()
+        Post post = postRepository.saveAndFlush(Post.builder()
             .member(member)
             .place(place)
             .title(title)
             .content("content")
             .build());
+        testPostIds.add(post.getId());
+        return post;
     }
 
     private void assertCount(String table, String column, Long id, int expected) {
@@ -214,4 +257,5 @@ class MemberWithdrawalIntegrationTest {
             any(Object[].class)
         );
     }
+
 }

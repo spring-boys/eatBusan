@@ -36,6 +36,7 @@ public enum ErrorCode {
     PLACE_LIKE_DUPLICATE(HttpStatus.BAD_REQUEST, "이미 좋아요한 장소입니다."),
 
     // redis
+    CACHE_BOOTSTRAP_IN_PROGRESS(HttpStatus.CONFLICT, "post-like 캐시 bootstrap 진행 중"),
     REDIS_BOOTSTRAP_TIMEOUT(HttpStatus.SERVICE_UNAVAILABLE, "좋아요 캐시 초기화 중입니다. 잠시 후 다시 시도해주세요."),
 
     // comment
