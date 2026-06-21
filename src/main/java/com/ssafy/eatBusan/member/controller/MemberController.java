@@ -1,6 +1,7 @@
 package com.ssafy.eatBusan.member.controller;
 
 import com.ssafy.eatBusan.auth.resolver.LoginMember;
+import com.ssafy.eatBusan.auth.util.CookieUtil;
 import com.ssafy.eatBusan.member.dto.LoginRequestDto;
 import com.ssafy.eatBusan.member.dto.MemberDto;
 import com.ssafy.eatBusan.member.dto.MemberInfoDto;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController {
 
     private final MemberService memberService;
+    private final CookieUtil cookieUtil;
 
     @PostMapping("/join")
     public ResponseEntity<Void> join(@RequestBody MemberRequestDto memberRequestDto){
@@ -45,7 +47,8 @@ public class MemberController {
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@LoginMember MemberDto member, HttpServletResponse httpResponse){
-        memberService.logout(member, httpResponse);
+        memberService.logout(member);
+        cookieUtil.invalidateRefreshToken(httpResponse);
         return ResponseEntity.ok().build();
     }
 
@@ -62,8 +65,12 @@ public class MemberController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> withdraw(@LoginMember MemberDto memberDto){
+    public ResponseEntity<Void> withdraw(
+            @LoginMember MemberDto memberDto,
+            HttpServletResponse httpResponse
+    ){
         memberService.deleteRelatedEntity(memberDto);
+        cookieUtil.invalidateRefreshToken(httpResponse);
         return ResponseEntity.noContent().build();
     }
 

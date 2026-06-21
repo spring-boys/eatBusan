@@ -69,6 +69,13 @@
       AND deleted = false
   </update>
 
+  <select id="findActivePostIdsByMemberId" resultType="long">
+    SELECT DISTINCT post_id
+    FROM post_comment
+    WHERE member_id = #{memberId}
+      AND deleted = false
+  </select>
+
   <delete id="deletePostCommentByMemberId">
     DELETE FROM post_comment
     WHERE member_id = #{memberId}
@@ -81,5 +88,20 @@
       #{postId}
     </foreach>
   </delete>
+
+  <update id="recalculateCommentCountsByPostIds">
+    UPDATE post p
+    SET comment_count = (
+      SELECT COUNT(*)
+      FROM post_comment pc
+      WHERE pc.post_id = p.id
+        AND pc.deleted = false
+    ),
+    updated_at = NOW()
+    WHERE p.id IN
+    <foreach collection="postIds" item="postId" open="(" separator="," close=")">
+      #{postId}
+    </foreach>
+  </update>
 
 </mapper>

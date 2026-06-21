@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findAllByDeletedFalse();
@@ -27,9 +28,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
 
     @Modifying(flushAutomatically = true, clearAutomatically = true)
-    @Query("delete from Post p where p.member.id =:memberId")
-    void deleteByMemberId(Long memberId);
+    @Query("delete from Post p where p.member.id = :memberId")
+    void deleteByMemberId(@Param("memberId") Long memberId);
 
-    @Query("select p.id from Post p where p.member.id =:memberId")
-    List<Long> findPostsByMemberId(Long memberId);
+    @Query("select p.id from Post p where p.member.id = :memberId")
+    List<Long> findPostsByMemberId(@Param("memberId") Long memberId);
 }
