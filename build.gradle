@@ -53,6 +53,8 @@ dependencies {
     implementation platform('software.amazon.awssdk:bom:2.27.21')
     implementation 'software.amazon.awssdk:s3'
 
+	// Spring Actuator
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
 }
 

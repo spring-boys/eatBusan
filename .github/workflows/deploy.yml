@@ -1,0 +1,68 @@
+name: CI/CD With docker
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs: # 작업 단위
+
+  build: # 빌드
+
+    runs-on: ubuntu-latest # 우분투 환경에서
+
+    permissions:
+      contents: read
+
+    # 빌드 - GitHub Actions의 가상 컴퓨터에서 빌드 수행
+    steps:
+      - name: 1. 최신의 코드를 가져오기
+        uses: actions/checkout@v4
+
+      - name: 2.JDK 설정
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+
+      - name: 3. 빌드 도구(Gradle) 설정
+        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+
+      - name: 4. 테스트 환경 properties 파일 주입
+        run: |
+          echo "${{ secrets.TEST_APPLICATION_PROPERTIES }}" > ./src/test/resources/application.properties
+
+      - name: 5. Redis환경을 GitHub Actions에서 실행
+        uses: supercharge/redis-github-action@1.1.0
+        with:
+          redis-version: 6
+
+      - name: 6. 테스트 및 빌드
+        run: ./gradlew clean build
+
+      - name: 7. AWS Resource에 접근하기 위한 AWS credentials 설정 (ECR에 접근하기 위함)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ap-northeast-2
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: 8. ECR에 로그인 (Elastic Container Registry - 도커 이미지 저장)
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: 9. Docker 이미지 생성
+        run: docker build --platform linux/amd64 -t ${{ steps.login-ecr.outputs.registry }}/eat-busan:sha-${{ github.sha }} .
+
+      - name: 10. ECR에 Docker 이미지 Push
+        run: docker push ${{ steps.login-ecr.outputs.registry }}/eat-busan:sha-${{ github.sha }}
+
+      - name: 11. SSH로 EC2 접속 후, 배포 스크립트 실행
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER_NAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          port: ${{ secrets.EC2_PORT }}
+          script: |
+            chmod +x /home/ubuntu/mydeploy/docker-deploy.sh
+            bash /home/ubuntu/mydeploy/docker-deploy.sh ${{ steps.login-ecr.outputs.registry }}/eat-busan:sha-${{ github.sha }}
