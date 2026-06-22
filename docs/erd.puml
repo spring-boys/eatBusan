@@ -1,0 +1,227 @@
+@startuml EatBusan ERD
+
+' 렌더링 방법
+' 1. IntelliJ IDEA: PlantUML Integration 플러그인 설치 후 이 파일 열기
+' 2. 온라인: https://www.plantuml.com/plantuml/uml/ 에 내용 붙여넣기
+' 3. VS Code: PlantUML 확장 설치 후 Alt+D
+
+skinparam linetype ortho
+
+' ─────────────────────────────────────────
+' 지역구/모범음식점
+' ─────────────────────────────────────────
+
+entity "district" {
+  * id : bigint <<PK>>
+  --
+  * code : varchar(30) <<UK>>
+  * name : varchar(50) <<UK>>
+  * created_at : datetime
+  * updated_at : datetime
+  * deleted : bit(1)
+}
+
+entity "excellent_place" {
+  * id : bigint <<PK>>
+  --
+  * district_id : bigint <<FK>>
+  source_id : varchar(100) <<UK>>
+  * name : varchar(255)
+  * road_address : varchar(255)
+  lot_address : varchar(255)
+  tel : varchar(50)
+  category : varchar(100)
+  main_menu : varchar(255)
+  description : text
+  latitude : decimal(10,7)
+  longitude : decimal(10,7)
+  designation_date : date
+  data_reference_date : date
+  * view_count : int
+  * bookmark_count : int
+  * review_count : int
+  * average_rating : decimal(2,1)
+  * created_at : datetime
+  * updated_at : datetime
+  * deleted : bit(1)
+}
+
+entity "place_menu" {
+  * id : bigint <<PK>>
+  --
+  * place_id : bigint <<FK>>
+  * name : varchar(255)
+  price : int
+  * is_signature : bit(1)
+  * created_at : datetime
+  * updated_at : datetime
+  * deleted : bit(1)
+}
+
+entity "place_image" {
+  * id : bigint <<PK>>
+  --
+  * place_id : bigint <<FK>>
+  * image_url : varchar(500)
+  image_key : varchar(255)
+  * sort_order : int
+  * created_at : datetime
+  * updated_at : datetime
+  * deleted : bit(1)
+}
+
+' ─────────────────────────────────────────
+' 사용자
+' ─────────────────────────────────────────
+
+entity "users" {
+  * id : bigint <<PK>>
+  --
+  * email : varchar(255) <<UK>>
+  * nickname : varchar(50) <<UK>>
+  password : varchar(255)
+  * provider : varchar(30)
+  provider_id : varchar(100)
+  profile_image : varchar(500)
+  * role : varchar(30)
+  * created_at : datetime
+  * updated_at : datetime
+  * deleted : bit(1)
+  ..
+  UNIQUE(provider, provider_id)
+}
+
+' ─────────────────────────────────────────
+' 커뮤니티
+' ─────────────────────────────────────────
+
+entity "post" {
+  * id : bigint <<PK>>
+  --
+  * user_id : bigint <<FK>>
+  * title : varchar(200)
+  * content : text
+  * category : varchar(30)
+  * view_count : int
+  * comment_count : int
+  * created_at : datetime
+  * updated_at : datetime
+  * deleted : bit(1)
+}
+
+entity "post_comment" {
+  * id : bigint <<PK>>
+  --
+  * post_id : bigint <<FK>>
+  * user_id : bigint <<FK>>
+  * content : text
+  * created_at : datetime
+  * updated_at : datetime
+  * deleted : bit(1)
+}
+
+entity "post_like" {
+  * id : bigint <<PK>>
+  --
+  * post_id : bigint <<FK>>
+  * user_id : bigint <<FK>>
+  * created_at : datetime
+  * updated_at : datetime
+  * deleted : bit(1)
+  ..
+  UNIQUE(post_id, user_id)
+}
+
+entity "post_place" {
+  * id : bigint <<PK>>
+  --
+  * post_id : bigint <<FK>>
+  * place_id : bigint <<FK>>
+  * created_at : datetime
+  * updated_at : datetime
+  * deleted : bit(1)
+  ..
+  UNIQUE(post_id, place_id)
+}
+
+' ─────────────────────────────────────────
+' 마이페이지
+' ─────────────────────────────────────────
+
+entity "place_bookmark" {
+  * id : bigint <<PK>>
+  --
+  * user_id : bigint <<FK>>
+  * place_id : bigint <<FK>>
+  * created_at : datetime
+  * updated_at : datetime
+  * deleted : bit(1)
+  ..
+  UNIQUE(user_id, place_id)
+}
+
+entity "place_review" {
+  * id : bigint <<PK>>
+  --
+  * user_id : bigint <<FK>>
+  * place_id : bigint <<FK>>
+  * content : text
+  * rating : tinyint
+  * like_count : int
+  * created_at : datetime
+  * updated_at : datetime
+  * deleted : bit(1)
+}
+
+entity "place_review_like" {
+  * id : bigint <<PK>>
+  --
+  * review_id : bigint <<FK>>
+  * user_id : bigint <<FK>>
+  * created_at : datetime
+  * updated_at : datetime
+  * deleted : bit(1)
+  ..
+  UNIQUE(review_id, user_id)
+}
+
+entity "notification" {
+  * id : bigint <<PK>>
+  --
+  * user_id : bigint <<FK>>
+  * type : varchar(30)
+  * message : varchar(255)
+  target_type : varchar(30)
+  target_id : bigint
+  * is_read : bit(1)
+  * created_at : datetime
+  * updated_at : datetime
+  * deleted : bit(1)
+}
+
+' ─────────────────────────────────────────
+' 관계
+' ─────────────────────────────────────────
+
+district             ||--o{ excellent_place  : "district_id"
+excellent_place      ||--o{ place_menu       : "place_id"
+excellent_place      ||--o{ place_image      : "place_id"
+excellent_place      ||--o{ place_bookmark   : "place_id"
+excellent_place      ||--o{ place_review     : "place_id"
+excellent_place      ||--o{ post_place       : "place_id"
+
+users                ||--o{ post             : "user_id"
+users                ||--o{ post_comment     : "user_id"
+users                ||--o{ post_like        : "user_id"
+users                ||--o{ place_bookmark   : "user_id"
+users                ||--o{ place_review     : "user_id"
+users                ||--o{ place_review_like : "user_id"
+users                ||--o{ notification     : "user_id"
+
+post                 ||--o{ post_comment     : "post_id"
+post                 ||--o{ post_like        : "post_id"
+post                 ||--o{ post_place       : "post_id"
+
+place_review         ||--o{ place_review_like : "review_id"
+
+@enduml

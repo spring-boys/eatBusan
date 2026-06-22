@@ -18,4 +18,12 @@ public interface PostImageMapper {
     List<PostImageDto> findByPostId(@Param("postId") Long postId);
 
     List<PostImageDto> findByPostIds(@Param("postIds") List<Long> postIds);
+
+    void deleteImage(
+        @Param("imageId") Long imageId
+    );
+
+    PostImageDto findByPostIdAndImageId(
+        @Param("postId") Long postId,
+        @Param("imageId") Long imageId);
 }
