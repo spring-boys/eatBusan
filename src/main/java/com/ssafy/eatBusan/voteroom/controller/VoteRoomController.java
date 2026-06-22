@@ -1,6 +1,8 @@
 package com.ssafy.eatBusan.voteroom.controller;
 
 import com.ssafy.eatBusan.auth.resolver.LoginMember;
+import com.ssafy.eatBusan.global.exception.EBException;
+import com.ssafy.eatBusan.global.exception.ErrorCode;
 import com.ssafy.eatBusan.member.dto.MemberDto;
 import com.ssafy.eatBusan.voteroom.dto.JoinRequest;
 import com.ssafy.eatBusan.voteroom.dto.VoteRequest;
@@ -35,7 +37,7 @@ public class VoteRoomController {
         @RequestBody VoteRoomCreateRequest request,
         @LoginMember MemberDto loginMember
     ) {
-        VoteRoomCreateResponse response = voteRoomService.create(loginMember.id(), request);
+        VoteRoomCreateResponse response = voteRoomService.create(requireMemberId(loginMember), request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -45,7 +47,7 @@ public class VoteRoomController {
         @RequestBody JoinRequest request,
         @LoginMember MemberDto loginMember
     ) {
-        return ResponseEntity.ok(voteRoomService.join(request.code(), loginMember.id()));
+        return ResponseEntity.ok(voteRoomService.join(request.code(), requireMemberId(loginMember)));
     }
 
     // 방 상세: 후보·참가자·내 표·상태 (참가자만)
@@ -54,7 +56,7 @@ public class VoteRoomController {
         @PathVariable String publicId,
         @LoginMember MemberDto loginMember
     ) {
-        return ResponseEntity.ok(voteRoomService.getDetail(publicId, loginMember.id()));
+        return ResponseEntity.ok(voteRoomService.getDetail(publicId, requireMemberId(loginMember)));
     }
 
     // 현재 집계 스냅샷: 폴링/재연결 직후 초기화용 (참가자만)
@@ -63,7 +65,7 @@ public class VoteRoomController {
         @PathVariable String publicId,
         @LoginMember MemberDto loginMember
     ) {
-        return ResponseEntity.ok(voteRoomService.getResult(publicId, loginMember.id()));
+        return ResponseEntity.ok(voteRoomService.getResult(publicId, requireMemberId(loginMember)));
     }
 
     // 투표/표 변경: 순위 ballot 제출. 같은 ballot 재제출은 멱등이므로 200으로 일괄 처리
@@ -73,7 +75,7 @@ public class VoteRoomController {
         @RequestBody VoteRequest request,
         @LoginMember MemberDto loginMember
     ) {
-        return ResponseEntity.ok(voteService.cast(publicId, loginMember.id(), request.candidateIds()));
+        return ResponseEntity.ok(voteService.cast(publicId, requireMemberId(loginMember), request.candidateIds()));
     }
 
     // 마감: 호스트만, 멱등 — 이미 CLOSED면 기존 winner 그대로 200
@@ -82,6 +84,15 @@ public class VoteRoomController {
         @PathVariable String publicId,
         @LoginMember MemberDto loginMember
     ) {
-        return ResponseEntity.ok(voteRoomService.close(publicId, loginMember.id()));
+        return ResponseEntity.ok(voteRoomService.close(publicId, requireMemberId(loginMember)));
+    }
+
+    // 투표는 로그인 회원만 가능: @LoginMember가 null(미인증)이면 401(TOKEN_NOT_FOUND)로 응답해
+    // 프론트가 로그인 화면으로 보내도록 한다. (전역 resolver는 place 등 낙관적 인증을 위해 null 허용)
+    private Long requireMemberId(MemberDto loginMember) {
+        if (loginMember == null) {
+            throw new EBException(ErrorCode.TOKEN_NOT_FOUND);
+        }
+        return loginMember.id();
     }
 }
