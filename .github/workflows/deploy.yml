@@ -31,32 +31,35 @@ jobs: # 작업 단위
         run: |
           echo "${{ secrets.TEST_APPLICATION_PROPERTIES }}" > ./src/test/resources/application.properties
 
-      - name: 5. Redis환경을 GitHub Actions에서 실행
+      - name: 5. 운영용 properties 파일 주입
+        run: echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.properties
+
+      - name: 6. Redis환경을 GitHub Actions에서 실행
         uses: supercharge/redis-github-action@1.1.0
         with:
           redis-version: 6
 
-      - name: 6. 테스트 및 빌드
+      - name: 7. 테스트 및 빌드
         run: ./gradlew clean build
 
-      - name: 7. AWS Resource에 접근하기 위한 AWS credentials 설정 (ECR에 접근하기 위함)
+      - name: 8. AWS Resource에 접근하기 위한 AWS credentials 설정 (ECR에 접근하기 위함)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ap-northeast-2
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: 8. ECR에 로그인 (Elastic Container Registry - 도커 이미지 저장)
+      - name: 9. ECR에 로그인 (Elastic Container Registry - 도커 이미지 저장)
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: 9. Docker 이미지 생성
+      - name: 10. Docker 이미지 생성
         run: docker build --platform linux/amd64 -t ${{ steps.login-ecr.outputs.registry }}/eat-busan:sha-${{ github.sha }} .
 
-      - name: 10. ECR에 Docker 이미지 Push
+      - name: 11. ECR에 Docker 이미지 Push
         run: docker push ${{ steps.login-ecr.outputs.registry }}/eat-busan:sha-${{ github.sha }}
 
-      - name: 11. SSH로 EC2 접속 후, 배포 스크립트 실행
+      - name: 12. SSH로 EC2 접속 후, 배포 스크립트 실행
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
