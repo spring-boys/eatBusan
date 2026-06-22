@@ -1,5 +1,7 @@
 package com.ssafy.eatBusan.post.controller;
 
+import com.ssafy.eatBusan.auth.resolver.LoginMember;
+import com.ssafy.eatBusan.member.dto.MemberDto;
 import com.ssafy.eatBusan.post.dto.PostRequireDto;
 import com.ssafy.eatBusan.post.dto.PostResponseDto;
 import com.ssafy.eatBusan.post.service.PostService;
@@ -32,6 +34,10 @@ public class PostController {
         return ResponseEntity.ok(postService.getAllPost(authorization));
     }
 
+    @GetMapping("/my")
+    public ResponseEntity<List<PostResponseDto>> getMyPost(@LoginMember MemberDto memberDto){
+        return ResponseEntity.ok(postService.getMyPost(memberDto));
+    }
 
     @GetMapping("/{postId}")
     public ResponseEntity<PostResponseDto> getPost(

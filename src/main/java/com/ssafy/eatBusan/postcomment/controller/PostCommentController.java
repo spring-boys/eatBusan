@@ -2,10 +2,13 @@ package com.ssafy.eatBusan.postcomment.controller;
 
 import com.ssafy.eatBusan.auth.resolver.LoginMember;
 import com.ssafy.eatBusan.member.dto.MemberDto;
+import com.ssafy.eatBusan.postcomment.dto.MyCommentDto;
+import com.ssafy.eatBusan.postcomment.dto.PostCommentDto;
 import com.ssafy.eatBusan.postcomment.dto.PostCommentPageResponse;
 import com.ssafy.eatBusan.postcomment.dto.PostCommentRequestDto;
 import com.ssafy.eatBusan.postcomment.service.PostCommentService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -57,5 +60,11 @@ public class PostCommentController {
         @LoginMember MemberDto member) {
         postCommentService.update(postId, commentId, requestDto.content(), member.id());
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @GetMapping("/comments/my")
+    public ResponseEntity<List<MyCommentDto>> getMyComments(@LoginMember MemberDto memberDto) {
+        List<MyCommentDto> myComments = postCommentService.findMyComments(memberDto);
+        return ResponseEntity.status(HttpStatus.OK).body(myComments);
     }
 }
