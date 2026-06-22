@@ -16,6 +16,7 @@ import com.ssafy.eatBusan.voteroom.service.VoteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -76,6 +77,15 @@ public class VoteRoomController {
         @LoginMember MemberDto loginMember
     ) {
         return ResponseEntity.ok(voteService.cast(publicId, requireMemberId(loginMember), request.candidateIds()));
+    }
+
+    // 다시 투표하기(취소/un-vote): 내 표를 모두 삭제하고 감소된 집계를 전원에게 broadcast. 멱등(표 없으면 no-op)
+    @DeleteMapping("/{publicId}/votes")
+    public ResponseEntity<VoteResponse> cancel(
+        @PathVariable String publicId,
+        @LoginMember MemberDto loginMember
+    ) {
+        return ResponseEntity.ok(voteService.cancel(publicId, requireMemberId(loginMember)));
     }
 
     // 마감: 호스트만, 멱등 — 이미 CLOSED면 기존 winner 그대로 200

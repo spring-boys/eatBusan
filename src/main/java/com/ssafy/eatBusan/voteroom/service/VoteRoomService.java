@@ -2,6 +2,8 @@ package com.ssafy.eatBusan.voteroom.service;
 
 import com.ssafy.eatBusan.global.exception.EBException;
 import com.ssafy.eatBusan.global.exception.ErrorCode;
+import com.ssafy.eatBusan.place.Repository.PlaceRepository;
+import com.ssafy.eatBusan.place.domain.Place;
 import com.ssafy.eatBusan.place.service.PlaceService;
 import com.ssafy.eatBusan.place.dto.PlaceRequestDto;
 import com.ssafy.eatBusan.place.dto.PlaceResponseListDto;
@@ -24,7 +26,10 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,8 +41,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class VoteRoomService {
 
-    // D1: searchPlace 결과 앞 5개를 후보로 시드한다 (거리순 무보장 — 기존 메서드 재사용 우선).
-    private static final int CANDIDATE_SEED_SIZE = 5;
+    // D1: searchPlace 결과 앞 20개를 후보로 시드한다 (거리순 무보장 — 기존 메서드 재사용 우선).
+    // 반환이 20개 미만이면 그만큼만 후보로 등록된다.
+    private static final int CANDIDATE_SEED_SIZE = 20;
 
     // 초대 코드: 6자리, 대문자+숫자에서 혼동문자(0,O,1,I,L) 제외한 알파벳 풀.
     private static final int INVITE_CODE_LENGTH = 6;
@@ -51,6 +57,7 @@ public class VoteRoomService {
     private final VoteRoomCacheService voteRoomCacheService;
     private final VoteRoomBroadcaster voteRoomBroadcaster;
     private final PlaceService placeService;
+    private final PlaceRepository placeRepository;
 
     @Transactional
     public VoteRoomCreateResponse create(Long hostMemberId, VoteRoomCreateRequest request) {
@@ -89,7 +96,7 @@ public class VoteRoomService {
         return new VoteRoomCreateResponse(
             room.getPublicId(),
             room.getInviteCode(),
-            candidates.stream().map(CandidateResponse::from).toList(),
+            toCandidateResponses(candidates),
             participants.stream().map(ParticipantResponse::from).toList());
     }
 
@@ -135,7 +142,7 @@ public class VoteRoomService {
             room.getInviteCode(),
             room.isHost(memberId),
             myBallot,
-            candidates.stream().map(CandidateResponse::from).toList(),
+            toCandidateResponses(candidates),
             participants.stream().map(ParticipantResponse::from).toList());
     }
 
@@ -200,6 +207,20 @@ public class VoteRoomService {
                 .thenComparing(Comparator.comparing(TallyEntry::candidateId).reversed()))
             .map(TallyEntry::candidateId)
             .orElse(null);
+    }
+
+    // 후보들의 placeId로 place 테이블을 일괄 조회해 리스팅 카드용 정보를 채운 CandidateResponse 목록을 만든다.
+    // place 행이 없는 후보는 스냅샷(placeName)만 채워진 응답이 된다.
+    private List<CandidateResponse> toCandidateResponses(List<VoteCandidate> candidates) {
+        List<Long> placeIds = candidates.stream()
+            .map(VoteCandidate::getPlaceId)
+            .distinct()
+            .toList();
+        Map<Long, Place> placeById = placeRepository.findAllById(placeIds).stream()
+            .collect(Collectors.toMap(Place::getId, Function.identity(), (a, b) -> a));
+        return candidates.stream()
+            .map(candidate -> CandidateResponse.from(candidate, placeById.get(candidate.getPlaceId())))
+            .toList();
     }
 
     private VoteRoom findRoom(String publicId) {
