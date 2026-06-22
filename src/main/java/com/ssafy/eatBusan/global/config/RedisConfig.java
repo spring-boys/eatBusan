@@ -23,5 +23,13 @@ public class RedisConfig {
         return redisScript;
     }
 
+    @Bean
+    public DefaultRedisScript<Long> postLikeInvalidateScript(){
+        DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>();
+        redisScript.setLocation(new ClassPathResource("scripts/post-like-invalidate.lua"));
+        redisScript.setResultType(Long.class);
+        return redisScript;
+    }
+
 
 }

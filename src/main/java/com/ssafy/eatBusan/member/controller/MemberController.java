@@ -1,6 +1,7 @@
 package com.ssafy.eatBusan.member.controller;
 
 import com.ssafy.eatBusan.auth.resolver.LoginMember;
+import com.ssafy.eatBusan.auth.util.CookieUtil;
 import com.ssafy.eatBusan.member.dto.LoginRequestDto;
 import com.ssafy.eatBusan.member.dto.MemberDto;
 import com.ssafy.eatBusan.member.dto.MemberInfoDto;
@@ -14,6 +15,7 @@ import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController {
 
     private final MemberService memberService;
+    private final CookieUtil cookieUtil;
 
     @PostMapping("/join")
     public ResponseEntity<Void> join(@RequestBody MemberRequestDto memberRequestDto){
@@ -44,7 +47,8 @@ public class MemberController {
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@LoginMember MemberDto member, HttpServletResponse httpResponse){
-        memberService.logout(member, httpResponse);
+        memberService.logout(member);
+        cookieUtil.invalidateRefreshToken(httpResponse);
         return ResponseEntity.ok().build();
     }
 
@@ -58,6 +62,16 @@ public class MemberController {
     public ResponseEntity<MemberInfoDto> getMyInfo(@LoginMember MemberDto memberDto) {
         MemberInfoDto response = memberService.findMemberInfo(memberDto);
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> withdraw(
+            @LoginMember MemberDto memberDto,
+            HttpServletResponse httpResponse
+    ){
+        memberService.deleteRelatedEntity(memberDto);
+        cookieUtil.invalidateRefreshToken(httpResponse);
+        return ResponseEntity.noContent().build();
     }
 
 }

@@ -57,6 +57,12 @@
       AND deleted = false
   </update>
 
-
+  <delete id="deleteByPostIds">
+    DELETE FROM post_image
+    WHERE post_id IN
+    <foreach collection="postIds" item="postId" open="(" separator="," close=")">
+      #{postId}
+    </foreach>
+  </delete>
 
 </mapper>
