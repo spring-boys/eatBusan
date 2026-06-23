@@ -109,6 +109,80 @@ public class VoteService {
         return new VoteResponse(candidateIds, snapshot.entries(), votedCount);
     }
 
+    // 다시 투표하기(취소/un-vote): 내 표를 모두 지우고 감소된 집계를 전원에게 broadcast한다.
+    // cast()와 동일한 패턴: 방 락 → CLOSED면 409 → 참가자 아니면 403 → 내 ballot 확보
+    // → DB 표 삭제 → Redis compensate(내 점수 차감 + ballotKey DEL) → afterCommit broadcast.
+    // 이미 표가 없으면 멱등 no-op(현재 스냅샷 반환). Redis 장애 시 cast와 같은 DB fallback.
+    @Transactional
+    public VoteResponse cancel(String publicId, Long memberId) {
+        // cast()/close()와 같은 방 행 락을 공유한다 — 마감과의 인터리빙 차단.
+        VoteRoom room = voteRoomRepository.findWithLockByPublicIdAndDeletedFalse(publicId)
+            .orElseThrow(() -> new EBException(ErrorCode.VOTE_ROOM_NOT_FOUND));
+        if (room.isClosed()) {
+            throw new EBException(ErrorCode.VOTE_ROOM_CLOSED);
+        }
+        voteParticipantRepository
+            .findByRoomIdAndMemberIdAndDeletedFalse(room.getId(), memberId)
+            .orElseThrow(() -> new EBException(ErrorCode.NOT_ROOM_PARTICIPANT));
+
+        List<Long> myBallot;
+        try {
+            // tally ZSET이 DB 기준으로 적재되어 있는지 보장한 뒤, 차감할 내 현재 ballot을 확보한다.
+            voteRoomCacheService.ensureBootstrap(publicId, room.getId());
+            myBallot = voteRoomCacheService.getMyBallot(publicId, room.getId(), memberId);
+        } catch (RedisConnectionFailureException e) {
+            log.warn("Redis unavailable, using DB fallback for cancel. publicId={} memberId={}",
+                publicId, memberId, e);
+            return cancelFallbackToDb(room, memberId);
+        }
+
+        // 이미 표가 없으면 멱등 no-op — Redis/DB 변경·broadcast 없이 현재 스냅샷만 반환한다.
+        if (myBallot.isEmpty()) {
+            TallySnapshot snapshot = voteRoomCacheService.getTally(publicId, room.getId());
+            long votedCount = voteRepository.countDistinctVotersByRoomId(room.getId());
+            return new VoteResponse(List.of(), snapshot.entries(), votedCount);
+        }
+
+        // DB에서 내 표를 물리 삭제한다. 실패 시 Redis는 아직 안 건드렸으므로 그대로 예외 전파.
+        voteRepository.deleteByRoomIdAndMemberId(room.getId(), memberId);
+        voteRepository.flush();
+
+        // Redis 차감: compensate(prevBallot="", newBallot=myBallot)는
+        // myBallot 점수를 차감하고 ballotKey를 DEL한다(=cast의 정확한 역연산, 첫 투표 되돌림과 동형).
+        // DB는 이미 삭제됐으므로 Redis 차감 실패 시 삼키고 broadcast로 진행한다.
+        // (Redis는 ensureBootstrap/getTally가 DB 기준으로 결국 수렴시킨다)
+        try {
+            voteRoomCacheService.compensate(publicId, memberId, "", myBallot);
+        } catch (Exception e) {
+            log.warn("Redis decrement failed on cancel, relying on bootstrap convergence. publicId={} memberId={}",
+                publicId, memberId, e);
+        }
+
+        TallySnapshot snapshot = voteRoomCacheService.getTally(publicId, room.getId());
+        long votedCount = voteRepository.countDistinctVotersByRoomId(room.getId());
+
+        // 감소된 집계 + votedCount를 커밋 후 전원에게 broadcast한다.
+        voteRoomBroadcaster.broadcastTallyUpdated(publicId, snapshot, votedCount);
+
+        return new VoteResponse(List.of(), snapshot.entries(), votedCount);
+    }
+
+    // Redis 다운 시 DB만으로 취소를 처리하고 DB 기준 집계를 돌려준다. (fallbackToDb와 동형)
+    private VoteResponse cancelFallbackToDb(VoteRoom room, Long memberId) {
+        voteRoomCacheService.tryInvalidateBootstrap(room.getPublicId());
+
+        voteRepository.deleteByRoomIdAndMemberId(room.getId(), memberId);
+        voteRepository.flush();
+
+        List<TallyEntry> tally = voteRoomCacheService.tallyFromDb(room.getId());
+        long votedCount = voteRepository.countDistinctVotersByRoomId(room.getId());
+
+        voteRoomBroadcaster.broadcastTallyUpdated(room.getPublicId(),
+            new TallySnapshot(VoteRoomCacheService.UNVERSIONED, tally), votedCount);
+
+        return new VoteResponse(List.of(), tally, votedCount);
+    }
+
     private void validateBallot(List<Long> candidateIds) {
         if (candidateIds == null || candidateIds.isEmpty()) {
             throw new EBException(ErrorCode.BALLOT_EMPTY);
