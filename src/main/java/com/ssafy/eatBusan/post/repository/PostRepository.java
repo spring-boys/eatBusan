@@ -22,4 +22,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                 group by p.place.id
             """)
     List<PostCntDto> countPostByIds(List<Long> placeIds);
+
+    List<Post> findAllByMemberIdAndDeletedFalseOrderByIdDesc(Long memberId);
 }

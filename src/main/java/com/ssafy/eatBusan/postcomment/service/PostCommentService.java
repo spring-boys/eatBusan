@@ -2,9 +2,11 @@ package com.ssafy.eatBusan.postcomment.service;
 
 import com.ssafy.eatBusan.global.exception.EBException;
 import com.ssafy.eatBusan.global.exception.ErrorCode;
+import com.ssafy.eatBusan.member.dto.MemberDto;
 import com.ssafy.eatBusan.member.repository.MemberRepository;
 import com.ssafy.eatBusan.post.domain.Post;
 import com.ssafy.eatBusan.post.repository.PostRepository;
+import com.ssafy.eatBusan.postcomment.dto.MyCommentDto;
 import com.ssafy.eatBusan.postcomment.dto.PostCommentDto;
 import com.ssafy.eatBusan.postcomment.dto.PostCommentPageResponse;
 import com.ssafy.eatBusan.postcomment.mapper.PostCommentMapper;
@@ -88,5 +90,9 @@ public class PostCommentService {
         if (memberRepository.findById(memberId).isEmpty()) {
             throw new EBException(ErrorCode.MEMBER_NOT_FOUND);
         }
+    }
+
+    public List<MyCommentDto> findMyComments(MemberDto memberDto) {
+        return postCommentMapper.findByMemberId(memberDto.id());
     }
 }

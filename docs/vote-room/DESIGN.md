@@ -306,3 +306,19 @@ StompAuthChannelInterceptor implements ChannelInterceptor
 - deadline 자동 마감 스케줄러 — 호스트 수동 마감만.
 - 초대 코드/링크, 친구 검색 — memberId 직접 지정으로 시작(D3).
 - 참가자가 후보 추가 — 호스트 위치 시드만(필요 시 후속).
+
+---
+
+## 14. 확정된 미해결 결정 (2026-06-11, 구현 착수 시점)
+
+| # | 결정 | 근거 |
+|---|------|------|
+| **D1. 후보 개수** | `searchPlace()` 결과 **앞 5개** 그대로 사용 (거리순 무보장) | searchPlace는 Kakao distance를 버리고 DB 순서로 반환 → 거리순 정렬 불가. 기존 메서드 재사용 우선 |
+| **D2. 동점 규칙** | 1차: **최소 candidateId 승리** (완전 결정론). 동점 재투표(RUNOFF)는 이슈 E로 후속 확장 | "먼저 도달" 규칙은 도달 시각 이력이 없어 현재 모델로 계산 불가. 재투표를 넣어도 최종 동점용 결정론 규칙은 어차피 필요 |
+| **D3. 초대 방식** | **memberId 리스트** 직접 지정 (문서 제안대로) | |
+
+### 구현 시 주의 (코드 검증으로 발견된 사실)
+- `JWTUtil.validateToken/getId`는 ACCESS 타입일 때 내부에서 `substring(7)` → **"Bearer " 접두사를 포함한 원문**을 넘겨야 함.
+- `PlaceRequestDto(x, y, radius)`에서 **x=경도(lng), y=위도(lat)** — API의 `{lat, lng}`와 순서 뒤집어 매핑.
+- ZSET tally는 ZINCRBY 안 된 후보를 갖지 않음 → **bootstrap 시 모든 candidate를 score 0으로 ZADD** 해야 0표 후보가 집계에 나타남.
+- `JwtFilter` WHITE_LIST에 `/api/**`(개발용)가 있어 모든 API가 필터 우회 중 → 토큰 없는 요청은 `@LoginMember`에서 NPE(500). 1차 범위에서는 그대로 두되 인지할 것.

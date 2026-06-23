@@ -1,5 +1,6 @@
 package com.ssafy.eatBusan.postcomment.mapper;
 
+import com.ssafy.eatBusan.postcomment.dto.MyCommentDto;
 import com.ssafy.eatBusan.postcomment.dto.PostCommentDto;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
@@ -30,5 +31,8 @@ public interface PostCommentMapper {
         @Param("size") int size);
 
     int increaseCommentCount(@Param("postId") Long postId);
+
     int decreaseCommentCount(@Param("postId") Long postId);
+
+    List<MyCommentDto> findByMemberId(@Param("memberId") Long memberId);
 }
