@@ -18,6 +18,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Value("${spring.front.domain}")
     private String frontDomain;
 
+    @Value("${spring.back.domain}")
+    private String backDomain;
+
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(loginMemberArgumentResolver);
@@ -26,7 +29,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
-                .allowedOrigins(frontDomain)
+                .allowedOrigins(frontDomain, backDomain)
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true)

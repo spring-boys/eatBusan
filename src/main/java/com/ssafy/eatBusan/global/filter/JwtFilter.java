@@ -29,6 +29,8 @@ public class JwtFilter implements Filter {
             "/api/members/refresh",
             "/api/posts/**",
             "/api/**", // 개발을 위한 whiteList
+            "/**",
+            "/api/**", // 개발을 위한 whiteList
             // WebSocket handshake — 브라우저는 WebSocket 핸드셰이크에 HTTP 헤더를 못 싣는다.
             // JWT 인증은 STOMP CONNECT 프레임에서 StompAuthChannelInterceptor가 수행한다.
             "/ws-stomp/**"
