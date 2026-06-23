@@ -18,7 +18,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Value("${spring.front.domain}")
     private String frontDomain;
 
-    @Value("${spring.front.domain}")
+    @Value("${spring.back.domain}")
     private String backDomain;
 
     @Override
