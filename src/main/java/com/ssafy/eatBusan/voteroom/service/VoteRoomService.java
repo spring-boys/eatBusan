@@ -114,6 +114,9 @@ public class VoteRoomService {
             .existsByRoomIdAndMemberIdAndDeletedFalse(room.getId(), memberId);
         if (!alreadyParticipant) {
             voteParticipantRepository.save(VoteParticipant.joined(room.getId(), memberId));
+            // 신규 입장 시에만 총원(분모)을 전원에게 실시간 broadcast (커밋 후). 멱등 재입장은 변화 없으므로 생략.
+            long participantCount = voteParticipantRepository.countByRoomIdAndDeletedFalse(room.getId());
+            voteRoomBroadcaster.broadcastParticipantsUpdated(room.getPublicId(), participantCount);
         }
 
         return getDetail(room.getPublicId(), memberId);

@@ -14,6 +14,9 @@ public interface VoteParticipantRepository extends JpaRepository<VoteParticipant
 
     boolean existsByRoomIdAndMemberIdAndDeletedFalse(Long roomId, Long memberId);
 
+    // 총원(분모) 실시간 broadcast용 — getDetail의 participants(findAll...)와 동일 기준으로 센다.
+    long countByRoomIdAndDeletedFalse(Long roomId);
+
     List<VoteParticipant> findAllByRoomIdAndDeletedFalse(Long roomId);
 
     // 방 단발성 hard delete: 방의 모든 참가자를 물리 삭제.

@@ -1,5 +1,6 @@
 package com.ssafy.eatBusan.voteroom.service;
 
+import com.ssafy.eatBusan.voteroom.dto.ParticipantsUpdatedMessage;
 import com.ssafy.eatBusan.voteroom.dto.RoomClosedMessage;
 import com.ssafy.eatBusan.voteroom.dto.TallyUpdatedMessage;
 import com.ssafy.eatBusan.voteroom.service.VoteRoomCacheService.TallySnapshot;
@@ -37,6 +38,11 @@ public class VoteRoomBroadcaster {
     // 마감 시 — 승자 + 최종 집계 broadcast (멱등 경로에서는 호출하지 말 것)
     public void broadcastRoomClosed(String publicId, Long winnerCandidateId, TallySnapshot snapshot, long votedCount) {
         sendAfterCommit(publicId, RoomClosedMessage.of(winnerCandidateId, snapshot.version(), snapshot.entries(), votedCount));
+    }
+
+    // 신규 참가자 입장 시 — 총원(분모)을 전원에게 broadcast. (집계 version과 무관한 별도 카운터)
+    public void broadcastParticipantsUpdated(String publicId, long participantCount) {
+        sendAfterCommit(publicId, ParticipantsUpdatedMessage.of(participantCount));
     }
 
     private void sendAfterCommit(String publicId, Object payload) {
